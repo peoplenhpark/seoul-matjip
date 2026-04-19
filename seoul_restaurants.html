@@ -420,7 +420,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.4</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.5</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -441,9 +441,18 @@
 </div>
 <div class="map-panel" id="mapPanel">
 <div class="map-sidebar" id="mapSidebar"></div>
-<svg viewBox="30 200 1300 680" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-  <!-- viewBox 여백 추가: 텍스트 라벨이 가장자리에 붙지 않도록 -->
-  <rect x="30" y="200" width="1300" height="680" fill="#fef6e0"/>
+<svg viewBox="30 120 1300 760" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <!-- viewBox 여백 + 상단 산줄기 그래픽 -->
+  <rect x="30" y="120" width="1300" height="760" fill="#fef6e0"/>
+
+  <!-- 상단 산줄기 (장식) -->
+  <path d="M50,220 Q200,140 320,200 Q450,125 570,195 Q700,130 830,200 Q960,135 1080,195 Q1210,140 1310,215 L1310,240 L50,240 Z" fill="#c8dbb4" opacity="0.8"/>
+  <path d="M50,220 Q200,140 320,200 Q450,125 570,195 Q700,130 830,200 Q960,135 1080,195 Q1210,140 1310,215" fill="none" stroke="#7a9a68" stroke-width="2" opacity="0.7"/>
+  <g fill="#4a6a3a" font-size="14" font-weight="900">
+    <text x="255" y="175">△ 인왕산</text>
+    <text x="505" y="170">△ 북악산</text>
+    <text x="1015" y="175">△ 낙산</text>
+  </g>
 
   <!-- 한양도성 경계 -->
   <path d="M130,260 Q80,540 230,800 Q700,860 1170,790 Q1280,540 1230,260" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
