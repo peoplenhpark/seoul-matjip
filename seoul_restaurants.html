@@ -362,9 +362,8 @@
   .course-card.active { background: linear-gradient(155deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
   .course-card .c-icon { font-size: 22px; line-height: 1; }
   .course-card .c-title {
-    font-size: 10px; font-weight: 900; line-height: 1.2;
-    word-break: keep-all; overflow-wrap: break-word;
-    white-space: pre-line;
+    font-size: 10.5px; font-weight: 900; line-height: 1.25;
+    word-break: keep-all;
     flex: 1; display: flex; align-items: center; justify-content: center;
     padding: 2px 0;
   }
@@ -472,7 +471,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.2</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.3</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -761,11 +760,11 @@ let filter = 'all';
 let activeCourse = null;
 
 const COURSES = [
-  { id:'lunch', icon:'🌅', title:'광화문\n런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
-  { id:'hanok', icon:'🏛️', title:'북촌\n한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
-  { id:'night', icon:'🌙', title:'명동\n야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
+  { id:'lunch', icon:'🌅', title:'광화문<br>런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
+  { id:'hanok', icon:'🏛️', title:'북촌<br>한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
+  { id:'night', icon:'🌙', title:'명동<br>야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
   { id:'michelin', icon:'🥇', title:'미쉐린', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
-  { id:'nopo', icon:'🕰️', title:'노포\n투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
+  { id:'nopo', icon:'🕰️', title:'노포<br>투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
 ];
 
 /* 주요 랜드마크 10곳 + 4대문 (공식 GPS) */
@@ -777,7 +776,7 @@ const LANDMARKS = [
   { n:'서울시청', lat:37.5665, lng:126.9780, icon:'🏛️' },
   { n:'보신각', lat:37.5703, lng:126.9838, icon:'🔔' },
   { n:'광장시장', lat:37.5705, lng:127.0025, icon:'🏪' },
-  { n:'DDP', lat:37.5675, lng:127.0094, icon:'🏟️' },
+  { n:'DDP', lat:37.5675, lng:127.0094, icon:'🎨' },
   { n:'명동성당', lat:37.5635, lng:126.9872, icon:'⛪' },
   { n:'북촌한옥마을', lat:37.5823, lng:126.9833, icon:'🏘️' }
 ];
