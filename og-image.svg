@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Gowun Dodum','Malgun Gothic',sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff6e0"/>
+      <stop offset="100%" stop-color="#f5d39c"/>
+    </linearGradient>
+    <linearGradient id="pinBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8752a"/>
+      <stop offset="100%" stop-color="#9a3810"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- 장식 산 실루엣 (상단) -->
+  <path d="M0,140 Q150,70 280,120 Q420,60 560,120 Q700,70 840,125 Q980,70 1120,130 L1200,130 L1200,180 L0,180 Z" fill="#a8c49c" opacity="0.6"/>
+
+  <!-- 한양도성 점선 원 (장식) -->
+  <ellipse cx="950" cy="380" rx="180" ry="140" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="10 6" opacity="0.55"/>
+
+  <!-- 카테고리 핀 6개 (장식) -->
+  <g transform="translate(900,280)">
+    <circle r="28" fill="#e8a848" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#3a2a10">🍖</text>
+  </g>
+  <g transform="translate(1000,280)">
+    <circle r="28" fill="#c05a3a" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🍚</text>
+  </g>
+  <g transform="translate(1100,320)">
+    <circle r="28" fill="#e07a92" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🍣</text>
+  </g>
+  <g transform="translate(850,400)">
+    <circle r="28" fill="#d04040" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🥢</text>
+  </g>
+  <g transform="translate(970,460)">
+    <circle r="28" fill="#70a860" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🌶️</text>
+  </g>
+  <g transform="translate(1080,460)">
+    <circle r="28" fill="#8870d0" stroke="#2a1a08" stroke-width="3"/>
+    <text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🥐</text>
+  </g>
+
+  <!-- 메인 타이틀 -->
+  <text x="60" y="200" font-size="38" font-weight="900" fill="#5a3a1a">🍽️ 서울 4대문 안</text>
+  <text x="60" y="280" font-size="72" font-weight="900" fill="#3a2a10">맛집 체크리스트</text>
+
+  <!-- 서브 카피 -->
+  <text x="60" y="335" font-size="26" font-weight="700" fill="#7a5a32">광화문 · 서촌 · 북촌 · 명동 · 을지로 · 종로</text>
+
+  <!-- 포인트 3줄 -->
+  <g font-size="24" font-weight="700" fill="#5a3a1a">
+    <circle cx="75" cy="400" r="6" fill="#e8752a"/>
+    <text x="95" y="408">호텔 제외 · 진짜 맛집 30곳 (미쉐린·노포·체인 대표점)</text>
+    <circle cx="75" cy="445" r="6" fill="#e8752a"/>
+    <text x="95" y="453">지도 + 체크리스트 + 룰렛 + 추천 코스 + 전화·예약 바로가기</text>
+    <circle cx="75" cy="490" r="6" fill="#e8752a"/>
+    <text x="95" y="498">📱 PWA 앱 설치 · 오프라인 지원 · 방문 기록(별점·메모)</text>
+  </g>
+
+  <!-- 하단 태그 바 -->
+  <rect x="60" y="530" width="1080" height="60" fill="#5a3a1a" rx="30"/>
+  <text x="600" y="570" text-anchor="middle" font-size="26" font-weight="900" fill="#fff6e0">
+    서울 도심 맛집 투어 · 30곳 · 홈화면 앱 설치 가능
+  </text>
+</svg>

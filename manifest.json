@@ -1,0 +1,35 @@
+{
+  "name": "서울 4대문 안 맛집 체크리스트",
+  "short_name": "서울 맛집",
+  "description": "서울 4대문 안 + 서촌·북촌·명동·장충 맛집 30곳 체크리스트",
+  "start_url": "./seoul_restaurants.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fef6e0",
+  "theme_color": "#5a3a1a",
+  "lang": "ko",
+  "categories": ["food", "travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "미방문 목록",
+      "short_name": "미방문",
+      "url": "./seoul_restaurants.html#todo",
+      "description": "아직 방문하지 않은 맛집만 보기"
+    }
+  ]
+}

@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes">
+<title>서울 4대문 안 맛집 체크리스트</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#5a3a1a">
+<meta name="description" content="서울 4대문 안 + 서촌·북촌·명동·장충 맛집 30곳 체크리스트. 호텔 제외, 실존 맛집만.">
+
+<!-- Open Graph (카카오톡·페이스북 공유 미리보기) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="🍽️ 서울 4대문 안 맛집 체크리스트">
+<meta property="og:description" content="광화문·서촌·북촌·명동·을지로의 진짜 맛집 30곳. 지도·체크리스트·추천 코스·룰렛까지. PWA 앱으로 설치 가능.">
+<meta property="og:image" content="og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ko_KR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🍽️ 서울 4대문 안 맛집 체크리스트">
+<meta name="twitter:description" content="서울 도심 맛집 30곳. 지도·체크리스트·룰렛.">
+<meta name="twitter:image" content="og-image.png">
+
+<!-- iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="서울 맛집">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<style>
+  :root {
+    --c-w: #e8a848; --c-k: #c05a3a; --c-j: #e07a92;
+    --c-c: #d04040; --c-s: #70a860; --c-e: #8870d0;
+    --bg: #fef6e0; --paper: #fff9ec; --ink: #5a3a1a;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bot: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { overscroll-behavior-y: contain; }
+  body { margin: 0; font-family: 'Gowun Dodum','Malgun Gothic',sans-serif; background: var(--bg); color: var(--ink); padding-bottom: var(--safe-bot); }
+
+  header {
+    background: linear-gradient(135deg, #8a5a28, #5a3a1a);
+    color: #fff6e0; padding: calc(14px + var(--safe-top)) 20px 14px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 20;
+  }
+  header h1 { margin: 0; font-size: 20px; font-weight: 900; line-height: 1.2; }
+  .progress-wrap { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 200px; justify-content: flex-end; }
+  .progress-bar { flex: 1; max-width: 200px; min-width: 100px; height: 18px; background: rgba(255,255,255,0.2); border-radius: 9px; overflow: hidden; border: 1px solid rgba(255,255,255,0.3); }
+  .progress-bar > div { height: 100%; background: linear-gradient(90deg, #e8a848, #f0c070); transition: width 0.3s; }
+  .progress-text { font-weight: 900; font-size: 14px; white-space: nowrap; }
+
+  .app { display: flex; gap: 16px; padding: 16px; max-width: 1800px; margin: 0 auto; }
+  .map-panel { flex: 1.25; position: sticky; top: 80px; align-self: flex-start; max-height: calc(100vh - 96px); }
+  .map-panel svg { width: 100%; height: auto; background: var(--paper); border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.12); display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .list-panel { flex: 1; min-width: 360px; }
+
+  /* Tablet */
+  @media (max-width: 960px) {
+    .app { flex-direction: column; padding: 10px; gap: 10px; }
+    .map-panel {
+      position: sticky; top: 72px; z-index: 10;
+      max-height: 45vh; overflow: hidden;
+      border-radius: 10px;
+    }
+    .map-panel.collapsed { max-height: 42px; }
+    .map-panel svg { max-height: calc(45vh - 42px); object-fit: contain; }
+    .map-toggle {
+      display: flex !important;
+      position: absolute; top: 6px; right: 8px; z-index: 5;
+      background: rgba(90,58,26,0.9); color: #fff6e0;
+      border: none; border-radius: 18px; padding: 6px 12px;
+      font-weight: 900; font-size: 12px; cursor: pointer;
+    }
+    .list-panel { min-width: auto; }
+  }
+  .map-toggle { display: none; }
+
+  /* Mobile phone */
+  @media (max-width: 640px) {
+    header { padding: calc(10px + var(--safe-top)) 14px 10px; gap: 8px; }
+    header h1 { font-size: 17px; width: 100%; }
+    .progress-wrap { width: 100%; justify-content: space-between; }
+    .progress-bar { max-width: none; }
+    .map-panel { top: 96px; max-height: 38vh; }
+    .map-panel svg { max-height: calc(38vh - 42px); }
+    .app { padding: 8px; }
+    .filters { padding: 8px; gap: 5px; overflow-x: auto; flex-wrap: nowrap; }
+    .filters button { padding: 8px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    .card-detail dl { grid-template-columns: 1fr; gap: 2px 0; }
+    .card-detail dt { margin-top: 6px; }
+    .card-detail dt:first-child { margin-top: 0; }
+    .card-check { width: 26px; height: 26px; }
+    .card-num { width: 34px; height: 34px; font-size: 15px; }
+    .card-name { font-size: 14px; }
+    .card-brief { margin-left: 48px; font-size: 12.5px; }
+    .card-detail { margin-left: 48px; padding: 10px 12px; font-size: 12.5px; }
+    .cuisine-head { font-size: 14px; padding: 7px 12px; }
+    .cuisine-head .count { font-size: 12px; }
+    .summary { font-size: 12px; padding: 10px; }
+    .reset-btn { padding: 5px 12px; font-size: 12px; }
+  }
+
+  /* Pin touch-target via visual hit area */
+  .pin-group { cursor: pointer; transition: transform 0.15s; }
+  .pin-group:hover circle.pin-fill { stroke-width: 3; }
+  .pin-group.visited .pin-fill { opacity: 0.3; }
+  .pin-group.highlight circle.pin-fill { stroke: #ffd700 !important; stroke-width: 4; }
+  .pin-group .pin-hit { fill: transparent; }
+
+  /* 지도 확대 버튼 */
+  .map-expand-btn {
+    position: absolute; top: 10px; left: 10px; z-index: 6;
+    background: rgba(90,58,26,0.92); color: #fff6e0;
+    border: none; border-radius: 18px; padding: 6px 12px;
+    font-weight: 900; font-size: 12px; cursor: pointer;
+  }
+  .map-expand-btn:hover { background: #5a3a1a; }
+  .map-panel { position: relative; }
+
+  /* 지도 사이드바 (기본 숨김, 확대 시 표시) */
+  .map-sidebar { display: none; }
+
+  /* ===== 지도 확대 모드 ===== */
+  .map-panel.fullscreen {
+    position: fixed !important; inset: 0 !important; z-index: 60;
+    background: rgba(40,26,10,0.85); max-height: none !important; max-width: none !important;
+    padding: 16px; top: 0 !important;
+    display: flex; gap: 12px; border-radius: 0;
+  }
+  .map-panel.fullscreen svg {
+    flex: 1; width: auto; height: 100% !important;
+    max-height: calc(100vh - 32px) !important; object-fit: contain;
+    background: #fef6e0; border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .map-panel.fullscreen .map-sidebar {
+    display: flex; flex-direction: column; gap: 10px;
+    width: 300px; flex-shrink: 0; background: var(--paper);
+    border-radius: 10px; padding: 14px; overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  .map-panel.fullscreen .map-expand-btn { display: none; }
+  .map-panel.fullscreen .map-toggle { display: none !important; }
+
+  .map-sidebar h3 { margin: 0; font-size: 16px; color: var(--ink); display: flex; justify-content: space-between; align-items: center; }
+  .map-sidebar .close-fs {
+    background: #5a3a1a; color: #fff6e0; border: none; border-radius: 50%;
+    width: 32px; height: 32px; font-size: 18px; font-weight: 900; cursor: pointer;
+  }
+  .map-sidebar .ms-progress {
+    padding: 10px; background: linear-gradient(90deg, #fde8b8, #fff6e0);
+    border-radius: 8px; font-size: 13px; font-weight: 900; color: #5a3a1a;
+    text-align: center;
+  }
+  .map-sidebar .ms-progress .big { font-size: 22px; color: #8a5a18; }
+  .map-sidebar .ms-cat { font-size: 12px; font-weight: 900; padding: 6px 10px; border-left: 4px solid; border-radius: 4px; margin-top: 8px; }
+  .map-sidebar .ms-cat.w { border-color: var(--c-w); background: #fdf4e0; color: #8a5a18; }
+  .map-sidebar .ms-cat.k { border-color: var(--c-k); background: #fdeadf; color: #6a2a18; }
+  .map-sidebar .ms-cat.j { border-color: var(--c-j); background: #fde5eb; color: #8a3a4a; }
+  .map-sidebar .ms-cat.c { border-color: var(--c-c); background: #fde0e0; color: #7a2020; }
+  .map-sidebar .ms-cat.s { border-color: var(--c-s); background: #e8f5dc; color: #3a5a2a; }
+  .map-sidebar .ms-cat.e { border-color: var(--c-e); background: #eee8fb; color: #4a3a8a; }
+  .map-sidebar .ms-pin {
+    display: flex; align-items: center; gap: 8px; padding: 5px 8px;
+    font-size: 12.5px; cursor: pointer; border-radius: 4px;
+    transition: background 0.1s;
+  }
+  .map-sidebar .ms-pin:hover { background: #fce9c4; }
+  .map-sidebar .ms-pin.visited { opacity: 0.5; text-decoration: line-through; }
+  .map-sidebar .ms-pin .dot { width: 18px; height: 18px; border-radius: 50%; color: #fff; font-size: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .map-sidebar .ms-pin .nm { flex: 1; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .map-sidebar .ms-pin .chk { color: #3a9a3a; font-weight: 900; }
+
+  @media (max-width: 640px) {
+    .map-panel.fullscreen { padding: 8px; flex-direction: column; gap: 8px; }
+    .map-panel.fullscreen svg { max-height: 55vh !important; }
+    .map-panel.fullscreen .map-sidebar { width: auto; flex: 1; min-height: 30vh; }
+  }
+
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px; background: #f5e3b8; border-radius: 10px; margin-bottom: 12px; }
+  .filters button {
+    padding: 7px 14px; border: 2px solid #8a6040; border-radius: 18px;
+    background: #fff; color: var(--ink); font-weight: 900; cursor: pointer; font-size: 13px;
+    transition: all 0.15s;
+  }
+  .filters button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .filters button[data-f="w"].active { background: var(--c-w); border-color: var(--c-w); color: #3a2a10; }
+  .filters button[data-f="k"].active { background: var(--c-k); border-color: var(--c-k); }
+  .filters button[data-f="j"].active { background: var(--c-j); border-color: var(--c-j); }
+  .filters button[data-f="c"].active { background: var(--c-c); border-color: var(--c-c); }
+  .filters button[data-f="s"].active { background: var(--c-s); border-color: var(--c-s); }
+  .filters button[data-f="e"].active { background: var(--c-e); border-color: var(--c-e); }
+
+  .cuisine-head {
+    font-size: 16px; font-weight: 900; margin: 14px 0 8px 0; padding: 8px 14px;
+    border-left: 5px solid; border-radius: 4px;
+  }
+  .cuisine-head.w { border-color: var(--c-w); background: #fdf4e0; color: #8a5a18; }
+  .cuisine-head.k { border-color: var(--c-k); background: #fdeadf; color: #6a2a18; }
+  .cuisine-head.j { border-color: var(--c-j); background: #fde5eb; color: #8a3a4a; }
+  .cuisine-head.c { border-color: var(--c-c); background: #fde0e0; color: #7a2020; }
+  .cuisine-head.s { border-color: var(--c-s); background: #e8f5dc; color: #3a5a2a; }
+  .cuisine-head.e { border-color: var(--c-e); background: #eee8fb; color: #4a3a8a; }
+  .cuisine-head .count { float: right; font-size: 13px; opacity: 0.75; }
+
+  .card {
+    background: var(--paper); border: 2px solid #e0d0a8; border-radius: 8px;
+    padding: 10px 14px; margin-bottom: 8px; transition: all 0.15s;
+  }
+  .card.visited { opacity: 0.55; background: #f0e8d0; }
+  .card.highlight { border-color: #e8a848; box-shadow: 0 0 0 3px rgba(232, 168, 72, 0.35); }
+  .card-top { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .card-check { width: 22px; height: 22px; flex-shrink: 0; cursor: pointer; accent-color: #e8a848; }
+  .card-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 14px; flex-shrink: 0; border: 2px solid #fff6e0; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .card-num.w { background: var(--c-w); color: #3a2a10; }
+  .card-num.k { background: var(--c-k); }
+  .card-num.j { background: var(--c-j); }
+  .card-num.c { background: var(--c-c); }
+  .card-num.s { background: var(--c-s); }
+  .card-num.e { background: var(--c-e); }
+  .card-info { flex: 1; min-width: 0; }
+  .card-name { font-size: 15px; font-weight: 900; }
+  .card-meta { font-size: 12px; color: #8a6040; margin-top: 2px; }
+  .card-arrow { color: #8a6040; font-weight: 900; transition: transform 0.2s; }
+  .card.expanded .card-arrow { transform: rotate(90deg); }
+  .card-brief { margin: 4px 0 0 42px; font-size: 13px; color: #5a4a30; }
+
+  .card-detail { display: none; margin: 10px 0 4px 42px; padding: 12px 14px; background: #fdf5d8; border-radius: 6px; border-left: 3px solid #d8b068; }
+  .card.expanded .card-detail { display: block; }
+  .card-detail dl { margin: 0; display: grid; grid-template-columns: 70px 1fr; gap: 4px 12px; font-size: 13px; }
+  .card-detail dt { font-weight: 900; color: #7a4a1a; }
+  .card-detail dd { margin: 0; color: #3a2a1a; }
+  .card-detail .note { margin-top: 8px; padding: 6px 10px; background: #fff6e0; border-radius: 4px; font-size: 12px; color: #6a4a20; }
+
+  .summary { background: var(--paper); border: 2px dashed #d8b068; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 13px; }
+  .summary strong { color: #8a5a18; }
+  .reset-btn { background: none; border: 1px solid rgba(255,255,255,0.5); color: #fff6e0; padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+  .reset-btn:hover { background: rgba(255,255,255,0.15); }
+
+  .uncert { display: inline-block; background: #ffd766; color: #5a3a00; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 900; margin-left: 4px; }
+
+  /* 영업 상태 뱃지 */
+  .status-badge { font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  .status-badge.open { background: #d4f0d0; color: #1a6a20; }
+  .status-badge.closing { background: #ffe4a8; color: #8a4a00; }
+  .status-badge.break { background: #fde5a8; color: #8a5a00; }
+  .status-badge.closed { background: #e8e0d0; color: #6a5a40; }
+
+  /* 빠른 실행 버튼 */
+  .card-actions { display: flex; gap: 6px; margin: 8px 0 4px 42px; flex-wrap: wrap; }
+  .card-actions .qa {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px; background: #fff; border: 1.5px solid #c0a068;
+    border-radius: 14px; text-decoration: none; color: #5a3a1a;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s;
+  }
+  .card-actions .qa:hover { background: #f4c078; color: #3a2a10; }
+  .card-actions .qa.phone { border-color: #60a070; color: #2a6a3a; }
+  .card-actions .qa.phone:hover { background: #60a070; color: #fff; }
+  .card-actions .qa.map { border-color: #4080c0; color: #2a4a7a; }
+  .card-actions .qa.map:hover { background: #4080c0; color: #fff; }
+  .card-actions .qa.book { border-color: #d85a5a; color: #7a2020; }
+  .card-actions .qa.book:hover { background: #d85a5a; color: #fff; }
+
+  /* 방문 기록 */
+  .visit-record {
+    margin: 6px 0 4px 42px; padding: 8px 12px;
+    background: #fff4de; border-left: 3px solid #e8a848; border-radius: 4px;
+    font-size: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .visit-record .stars { color: #e8a848; font-size: 14px; }
+  .visit-record .visit-date { color: #8a6040; font-weight: 700; }
+  .visit-record .visit-memo { flex: 1; min-width: 120px; color: #3a2a1a; font-style: italic; }
+  .visit-record .edit-visit {
+    background: none; border: 1px solid #c0a068; border-radius: 10px;
+    padding: 2px 8px; font-size: 11px; cursor: pointer; color: #5a3a1a;
+  }
+
+  /* 헤더 추가 버튼 */
+  .hdr-btn {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.4);
+    color: #fff6e0; padding: 6px 12px; border-radius: 18px; font-size: 13px;
+    font-weight: 900; cursor: pointer; white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .hdr-btn:hover { background: rgba(255,255,255,0.28); }
+
+  /* 코스 섹션 (4칸 한화면 보장, 5번째는 오른쪽 스크롤) */
+  .course-row {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc((100% - 18px) / 4);
+    gap: 6px; overflow-x: auto; padding: 6px 0 8px;
+    margin-bottom: 10px; scrollbar-width: thin;
+    scroll-snap-type: x mandatory;
+  }
+  .course-card {
+    scroll-snap-align: start;
+    background: linear-gradient(135deg, #fff6e0, #fde8b8);
+    border: 2px solid #d8b068; border-radius: 10px; padding: 6px 3px 5px;
+    text-align: center; cursor: pointer; transition: all 0.15s;
+    overflow: hidden;
+  }
+  .course-card:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .course-card.active { background: linear-gradient(135deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
+  .course-card .c-icon { font-size: 22px; display: block; line-height: 1; }
+  .course-card .c-title { font-size: 10.5px; font-weight: 900; margin: 3px 0 1px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .course-card .c-desc { display: none; }
+  .course-card .c-count { font-size: 9px; font-weight: 700; opacity: 0.8; }
+
+  @media (min-width: 960px) {
+    .course-card { padding: 8px 6px 6px; }
+    .course-card .c-icon { font-size: 26px; }
+    .course-card .c-title { font-size: 12px; }
+    .course-card .c-count { font-size: 10.5px; }
+  }
+  .course-banner {
+    padding: 12px; margin-bottom: 12px; border-radius: 8px;
+    background: linear-gradient(90deg, #fde8b8, #fff6e0);
+    border-left: 5px solid #e8a848; font-size: 13px;
+  }
+  .course-banner strong { color: #8a5a18; }
+  .course-banner .close-course {
+    float: right; background: none; border: none; font-size: 18px;
+    cursor: pointer; color: #8a5a18;
+  }
+
+  /* 모달 */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 100;
+    display: none; align-items: center; justify-content: center; padding: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--paper); border-radius: 14px; max-width: 420px; width: 100%;
+    padding: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h2 { margin: 0 0 12px; font-size: 18px; color: var(--ink); }
+  .modal .close-btn {
+    float: right; background: none; border: none; font-size: 22px;
+    cursor: pointer; color: #8a6040; line-height: 1;
+  }
+  .modal label { display: block; margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--ink); }
+  .modal input, .modal textarea, .modal select {
+    width: 100%; padding: 8px 10px; border: 1.5px solid #c0a068; border-radius: 6px;
+    font-size: 14px; margin-top: 4px; font-family: inherit; background: #fff;
+  }
+  .modal textarea { resize: vertical; min-height: 60px; }
+  .modal .btn-row { margin-top: 14px; display: flex; gap: 8px; justify-content: flex-end; }
+  .modal button.primary {
+    background: var(--c-w); border: 2px solid var(--c-w); color: #3a2a10;
+    padding: 8px 18px; border-radius: 6px; font-weight: 900; cursor: pointer;
+  }
+  .modal button.secondary {
+    background: #fff; border: 2px solid #c0a068; color: var(--ink);
+    padding: 8px 18px; border-radius: 6px; font-weight: 900; cursor: pointer;
+  }
+
+  /* 별점 선택 */
+  .rating-input { display: flex; gap: 4px; margin-top: 4px; font-size: 28px; }
+  .rating-input .star { cursor: pointer; color: #e0d0a8; user-select: none; transition: transform 0.1s; }
+  .rating-input .star:hover { transform: scale(1.15); }
+  .rating-input .star.filled { color: #e8a848; }
+
+  /* 룰렛 */
+  .roulette-display {
+    text-align: center; padding: 20px; min-height: 140px;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+  }
+  .roulette-display .slot {
+    font-size: 24px; font-weight: 900; color: var(--ink);
+    padding: 10px; transition: all 0.1s;
+  }
+  .roulette-display .slot.final {
+    font-size: 28px; color: #b85a28;
+    animation: pop 0.6s cubic-bezier(0.2, 1, 0.4, 1.2);
+  }
+  .roulette-display .slot-sub { color: #8a6040; font-size: 14px; }
+  .roulette-display .go-btn {
+    margin-top: 16px; padding: 12px 24px; background: #e8a848; border: none;
+    border-radius: 24px; font-weight: 900; font-size: 15px; color: #3a2a10;
+    cursor: pointer; box-shadow: 0 3px 10px rgba(232,168,72,0.4);
+  }
+  @keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* 커스텀 추가 · 뱃지 */
+  .custom-badge {
+    display: inline-block; background: #8870d0; color: #fff;
+    padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 900; margin-left: 4px;
+  }
+
+  @media (max-width: 640px) {
+    .card-actions { margin-left: 48px; gap: 5px; }
+    .card-actions .qa { padding: 5px 10px; font-size: 11px; }
+    .status-badge { font-size: 10px; padding: 2px 6px; }
+    .visit-record { margin-left: 48px; font-size: 11px; }
+    .course-card { min-width: 160px; }
+    .hdr-btn { padding: 5px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트</h1>
+  <div class="progress-wrap">
+    <div class="progress-bar"><div id="pbar"></div></div>
+    <div class="progress-text" id="pText">0 / 30</div>
+    <button class="hdr-btn" onclick="openRoulette()">🎲 룰렛</button>
+    <button class="hdr-btn" onclick="openCustomForm()">➕ 추가</button>
+    <button class="reset-btn" id="installBtn" style="display:none;" onclick="installApp()">📱 앱 설치</button>
+    <button class="reset-btn" onclick="if(confirm('방문 기록을 초기화할까요? 평점·메모·추가 맛집도 사라집니다.')){localStorage.removeItem('sj_visited');localStorage.removeItem('sj_visits');localStorage.removeItem('sj_custom');visited=[];visits={};customR=[];render();}">초기화</button>
+  </div>
+</header>
+
+<div class="app">
+
+<!-- ============ 지도 패널 ============ -->
+<div class="map-panel" id="mapPanel">
+<button class="map-expand-btn" onclick="toggleFullscreen()">⛶ 크게보기</button>
+<button class="map-toggle" id="mapToggle" onclick="toggleMap()">🗺️ 지도 접기</button>
+<div class="map-sidebar" id="mapSidebar"></div>
+<svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
+  <!-- 간단 지도: 핀 가독성·터치 줌 최적화 -->
+  <rect width="1400" height="900" fill="#fef6e0"/>
+  <rect x="40" y="40" width="1320" height="820" fill="none" stroke="#c0a068" stroke-width="2" rx="16"/>
+
+  <text x="700" y="58" text-anchor="middle" font-size="22" font-weight="900" fill="#5a3a1a">서울 4대문 안 · 맛집 지도</text>
+
+  <!-- 한양도성 경계 -->
+  <path d="M130,270 Q75,540 230,800 Q700,880 1170,790 Q1320,530 1250,270" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
+
+  <!-- 산 라벨 -->
+  <g fill="#3a5a2a" font-size="16" font-weight="900">
+    <text x="200" y="160">△ 인왕산</text>
+    <text x="450" y="155">△ 북악산</text>
+    <text x="920" y="160">△ 낙산</text>
+  </g>
+
+  <!-- 3대 궁·종묘 (얕은 블록) -->
+  <g fill="#f3e4c5" stroke="#b88e58" stroke-width="2">
+    <rect x="440" y="275" width="190" height="110" rx="8"/>
+    <rect x="735" y="285" width="128" height="88" rx="8"/>
+    <rect x="905" y="310" width="98" height="72" rx="8"/>
+  </g>
+  <g fill="#8a5a28" font-size="16" font-weight="900">
+    <text x="480" y="340">경복궁</text>
+    <text x="760" y="335">창덕궁</text>
+    <text x="925" y="352">종묘</text>
+  </g>
+
+  <!-- 4대문 점 -->
+  <g>
+    <circle cx="560" cy="242" r="10" fill="#e8752a"/>
+    <text x="576" y="247" font-size="13" font-weight="900" fill="#5a3a1a">숙정문(북)</text>
+
+    <circle cx="124" cy="490" r="10" fill="none" stroke="#e8752a" stroke-width="3" stroke-dasharray="3 2"/>
+    <text x="50" y="475" font-size="13" font-weight="900" fill="#5a3a1a">돈의문터(서)</text>
+
+    <circle cx="1280" cy="490" r="10" fill="#e8752a"/>
+    <text x="1195" y="475" font-size="13" font-weight="900" fill="#5a3a1a">흥인지문(동)</text>
+
+    <circle cx="560" cy="852" r="10" fill="#e8752a"/>
+    <text x="578" y="858" font-size="13" font-weight="900" fill="#5a3a1a">숭례문(남)</text>
+  </g>
+
+  <!-- 세종대로 (남북) -->
+  <line x1="555" y1="260" x2="555" y2="780" stroke="#c0a068" stroke-width="8"/>
+  <text x="570" y="275" font-size="13" font-weight="900" fill="#5a3a1a">세종대로</text>
+
+  <!-- 종로 (y=510) -->
+  <line x1="110" y1="510" x2="1280" y2="510" stroke="#e8a848" stroke-width="14"/>
+  <text x="60" y="515" font-size="22" font-weight="900" fill="#8a5a18">종로</text>
+  <g font-size="14" font-weight="900" fill="#fff">
+    <circle cx="258"  cy="510" r="13" fill="#8a5a18"/><text x="253" y="515">1</text>
+    <circle cx="435"  cy="510" r="13" fill="#8a5a18"/><text x="430" y="515">2</text>
+    <circle cx="612"  cy="510" r="13" fill="#8a5a18"/><text x="607" y="515">3</text>
+    <circle cx="789"  cy="510" r="13" fill="#8a5a18"/><text x="784" y="515">4</text>
+    <circle cx="966"  cy="510" r="13" fill="#8a5a18"/><text x="961" y="515">5</text>
+    <circle cx="1143" cy="510" r="13" fill="#8a5a18"/><text x="1138" y="515">6</text>
+  </g>
+
+  <!-- 청계천 -->
+  <path d="M110,590 L1280,590" stroke="#6fb4d6" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <text x="60" y="594" font-size="13" font-weight="900" fill="#3a7aa0">청계천</text>
+
+  <!-- 을지로 -->
+  <line x1="110" y1="675" x2="1280" y2="675" stroke="#4a7ba0" stroke-width="14"/>
+  <text x="60" y="680" font-size="20" font-weight="900" fill="#1e3450">을지로</text>
+  <g font-size="13" font-weight="900" fill="#fff">
+    <circle cx="246"  cy="675" r="12" fill="#1e3450"/><text x="242" y="680">1</text>
+    <circle cx="397"  cy="675" r="12" fill="#1e3450"/><text x="393" y="680">2</text>
+    <circle cx="548"  cy="675" r="12" fill="#1e3450"/><text x="544" y="680">3</text>
+    <circle cx="700"  cy="675" r="12" fill="#1e3450"/><text x="696" y="680">4</text>
+    <circle cx="852"  cy="675" r="12" fill="#1e3450"/><text x="848" y="680">5</text>
+    <circle cx="1004" cy="675" r="12" fill="#1e3450"/><text x="1000" y="680">6</text>
+    <circle cx="1156" cy="675" r="12" fill="#1e3450"/><text x="1152" y="680">7</text>
+  </g>
+
+  <!-- 퇴계로 / 남대문로 -->
+  <line x1="110" y1="760" x2="1280" y2="760" stroke="#c0a068" stroke-width="6"/>
+  <text x="60" y="764" font-size="13" font-weight="900" fill="#5a3a1a">퇴계로</text>
+  <line x1="555" y1="780" x2="555" y2="850" stroke="#c0a068" stroke-width="6"/>
+
+  <!-- 명동 핀 -->
+  <circle cx="570" cy="735" r="14" fill="#e07a92" stroke="#6a4020" stroke-width="2"/>
+  <text x="557" y="739" font-size="11" font-weight="900" fill="#fff">명동</text>
+
+  <!-- 상세 지도 링크 (오른쪽 상단) -->
+  <a href="seoul_4daemun.html" target="_blank">
+    <rect x="1170" y="45" width="180" height="32" rx="16" fill="#5a3a1a"/>
+    <text x="1260" y="66" text-anchor="middle" fill="#fff6e0" font-size="13" font-weight="900">📜 상세 지도 보기 →</text>
+  </a>
+
+  <!-- 나침반 -->
+  <g transform="translate(80,270)">
+    <circle r="22" fill="#fff6e0" stroke="#6a4020" stroke-width="2"/>
+    <polygon points="0,-18 5,0 0,18 -5,0" fill="#d87050"/>
+    <text x="-5" y="-28" font-size="12" font-weight="900" fill="#5a2a1a">N</text>
+  </g>
+
+  <!-- ===== 식당 핀 (JS로 생성) ===== -->
+  <g id="pins"></g>
+</svg>
+</div>
+
+<!-- ============ 리스트 패널 ============ -->
+<div class="list-panel">
+  <div class="summary">
+    💡 <strong>사용법</strong> · 카드를 눌러 상세 정보, 체크하면 방문 기록(날짜·평점·메모) 입력. 지도 핀=카드 이동, 핀치줌 지원. <br>
+    📍 호텔 제외 · <strong>4대문 안 + 서촌·북촌·삼청동·명동·장충 북쪽</strong> 맛집 30곳
+  </div>
+
+  <!-- 추천 코스 -->
+  <div id="courseBanner"></div>
+  <div class="course-row" id="courseRow"></div>
+
+  <div class="filters">
+    <button class="active" data-f="all">전체</button>
+    <button data-f="w">양식</button>
+    <button data-f="k">한식</button>
+    <button data-f="j">일식</button>
+    <button data-f="c">중식</button>
+    <button data-f="s">동남아</button>
+    <button data-f="e">유럽식</button>
+    <button data-f="todo">미방문만</button>
+  </div>
+  <div id="list"></div>
+</div>
+
+</div>
+
+<!-- 룰렛 모달 -->
+<div class="modal-overlay" id="rouletteModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeRoulette()">×</button>
+    <h2>🎲 지금 뭐 먹지?</h2>
+    <div class="roulette-display" id="rouletteDisplay"></div>
+  </div>
+</div>
+
+<!-- 방문 기록 모달 -->
+<div class="modal-overlay" id="visitModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeVisitModal()">×</button>
+    <h2 id="visitModalTitle">🎉 방문 기록</h2>
+    <label>📅 방문 날짜
+      <input type="date" id="visitDate">
+    </label>
+    <label>⭐ 평점
+      <div class="rating-input" id="ratingInput"></div>
+    </label>
+    <label>📝 한줄 메모
+      <textarea id="visitMemo" placeholder="예: 포터하우스 최고, 창가석 굿"></textarea>
+    </label>
+    <div class="btn-row">
+      <button class="secondary" onclick="skipVisit()">건너뛰기</button>
+      <button class="primary" onclick="saveVisit()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 커스텀 추가 모달 -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeCustomModal()">×</button>
+    <h2>➕ 내 맛집 추가</h2>
+    <label>식당 이름
+      <input type="text" id="cmName" placeholder="예: 을지로 골뱅이집">
+    </label>
+    <label>카테고리
+      <select id="cmCat">
+        <option value="w">양식</option>
+        <option value="k">한식</option>
+        <option value="j">일식</option>
+        <option value="c">중식</option>
+        <option value="s">동남아</option>
+        <option value="e">유럽식</option>
+      </select>
+    </label>
+    <label>지역/주소
+      <input type="text" id="cmArea" placeholder="예: 중구 을지로3가">
+    </label>
+    <label>간단 설명
+      <textarea id="cmDesc" placeholder="기억에 남는 점·메뉴 등"></textarea>
+    </label>
+    <label>전화 (선택)
+      <input type="text" id="cmPhone" placeholder="예: 02-123-4567">
+    </label>
+    <div class="btn-row">
+      <button class="secondary" onclick="closeCustomModal()">취소</button>
+      <button class="primary" onclick="saveCustom()">추가</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CUISINES = { w:'양식', k:'한식', j:'일식', c:'중식', s:'동남아식', e:'유럽식' };
+const COLORS = { w:'#e8a848', k:'#c05a3a', j:'#e07a92', c:'#d04040', s:'#70a860', e:'#8870d0' };
+
+const R = [
+  // 양식 w1-w5 (아메리칸·스테이크·버거)
+  { id:'w1', n:'울프강 스테이크하우스 광화문점', v:'태평로1가 빌딩 2F', a:'중구 세종대로21길 40', x:485, y:555,
+    b:'뉴욕 3대 스테이크, 2025 광화문 진출', phone:'02-722-9004',
+    desc:'뉴욕에서 시작된 프리미엄 스테이크하우스. 드라이에이징 포터하우스와 크랩케이크 명성. 세계 41번째 매장이 광화문에 오픈.',
+    hours:'런치 11:30-15:00 / 디너 17:30-22:00', price:'1인 12~25만원',
+    menu:'포터하우스 스테이크, 크랩케이크, 시저샐러드', tip:'캐치테이블 예약. 2인 포터하우스 추천.' },
+  { id:'w2', n:'마치 (MAACHI) 스테이크하우스', v:'광화문 그랑서울 지하', a:'종로구 종로 33 그랑서울', x:485, y:440,
+    b:'한우 스테이크 코스 파인다이닝',
+    desc:'미쉐린 Joux·July 출신 이종욱 셰프의 한우 스테이크 전문점. 코스형 프리미엄 다이닝.',
+    hours:'런치 12:00-15:00 / 디너 18:00-22:00', price:'코스 12~28만원',
+    menu:'한우 드라이에이징, 시즌 코스', tip:'캐치테이블 예약 필수.' },
+  { id:'w3', n:'쉑쉑버거 광화문 D타워', v:'D타워 1F', a:'종로구 종로3길 17', x:320, y:475,
+    b:'뉴욕 프리미엄 버거',
+    desc:'뉴욕 쉑쉑의 광화문 지점. D타워 1층, 쉑버거와 쉑쉑 크림치즈가 시그니처.',
+    hours:'매일 11:00-22:00', price:'버거 세트 1~1.6만원',
+    menu:'쉑버거, 스모크쉑, 쉐이크', tip:'점심시간 대기 있음. 앱 주문 가능.' },
+  { id:'w4', n:'파이브가이즈 광화문점', v:'D타워 주변', a:'광화문 D타워 / 센터포인트', x:335, y:465,
+    b:'미국 프리미엄 수제버거',
+    desc:'미국 동부 출신 수제버거 체인. 주문 시 바로 만드는 패티와 무제한 땅콩.',
+    hours:'매일 11:00-22:00', price:'버거 세트 1.5~2.2만원',
+    menu:'베이컨 치즈버거, 케이준 프라이', tip:'토핑 무제한 무료. 양 많음.' },
+  { id:'w5', n:'바스버거 광화문점', v:'광화문 빌딩 1F', a:'종로구 광화문 인근', x:355, y:488,
+    b:'한국 수제버거 대표 브랜드',
+    desc:'국산 한우 패티를 쓰는 국내 프리미엄 수제버거. 광화문 오피스 직장인 인기.',
+    hours:'매일 11:00-21:30', price:'버거 세트 1.2~1.8만원',
+    menu:'한우 버거, 클래식 치즈버거', tip:'광화문 런치타임 인기, 웨이팅 가능.' },
+
+  // 한식 k1-k5 (노포·미쉐린)
+  { id:'k1', n:'광화문 미진', v:'르메이에르종로타운 1F', a:'종로구 종로 19', x:255, y:498,
+    b:'평양냉면·메밀 노포 (1954~)', phone:'02-730-6198',
+    desc:'1954년 개업한 서울의 대표 메밀냉면 노포. 깔끔한 육수와 쫄깃한 메밀면. 미쉐린 가이드 다년 등재.',
+    hours:'매일 10:30-21:00 (L.O. 20:30)', price:'냉메밀 1.3만원~',
+    menu:'냉메밀(평양냉면), 편육, 녹두전', tip:'런치 시간 대기 긺. 오픈런 추천.' },
+  { id:'k2', n:'우래옥', v:'창경궁로 62-29', a:'중구 주교동', x:740, y:595,
+    b:'평양냉면 원조 (1946~), 미쉐린 빕구르망',
+    desc:'1946년 창업한 서울 최고(最古) 평양냉면집. 소고기 육수의 진한 풍미. 2022~2025 4년 연속 미쉐린 빕구르망.',
+    hours:'화~일 11:30-21:00 (월 휴무)', price:'평양냉면 1.6만원',
+    menu:'평양냉면, 불고기, 김치말이밥', tip:'냉면에 밥 말아먹기 유명. 주말 대기 김.' },
+  { id:'k3', n:'명동교자 본점', v:'명동10길 29', a:'중구 명동', x:595, y:708,
+    b:'칼국수·만두 노포 (1966~)',
+    desc:'1966년 명동에서 시작된 칼국수·만두 전문 노포. 닭 육수 손칼국수와 고기만두가 시그니처.',
+    hours:'매일 10:30-21:30', price:'칼국수·만두 9~11천원',
+    menu:'칼국수, 콩국수, 고기만두', tip:'관광객·직장인 모두 찾는 서울 필수 노포.' },
+  { id:'k4', n:'용수산 비원점', v:'창덕궁1길 2', a:'종로구 와룡동 (창덕궁 옆)', x:800, y:440,
+    b:'개성 한정식·미쉐린 선정',
+    desc:'개성식 한정식 전문. 창덕궁·창경궁 바로 옆 고즈넉한 한옥 분위기. 미쉐린 가이드 등재.',
+    hours:'11:30-22:00 (B/T 15:00-17:30, 월 휴무)', price:'한정식 4~10만원',
+    menu:'개성만두, 궁중 한정식 코스', tip:'창덕궁 관람 후 코스 적합.' },
+  { id:'k5', n:'온지움 (Onjium)', v:'한옥 단독', a:'종로구 효자로 (서촌)', x:418, y:385,
+    b:'미쉐린 ★ · 궁중·반가 한정식',
+    desc:'궁중음식·반가음식을 현대적으로 재해석. 전통 한옥 공간. 미쉐린 1스타 다년 유지.',
+    hours:'런치·디너 2회전 (예약제)', price:'1인 18~30만원',
+    menu:'맷돌두부, 궁중신선로, 계절 반찬', tip:'1~2개월 전 예약 오픈, 조기 마감.' },
+
+  // 일식 j1-j5 (스시 오마카세·라멘)
+  { id:'j1', n:'스시 소라 광화문점', v:'르메이에르종로타운 B1', a:'종로구 종로 19', x:245, y:518,
+    b:'광화문 스시 오마카세 대표', phone:'02-733-8400',
+    desc:'광화문·종각 오마카세 1대장으로 불리는 미들급 대표점. 코우지 시리즈 스시 전문.',
+    hours:'월~금 11:30-21:50 / 토·일 11:30-21:20', price:'런치 6만원 / 디너 11만원',
+    menu:'오마카세 스시·사시미 코스', tip:'캐치테이블 예약. 2시간 주차 지원.' },
+  { id:'j2', n:'스시 키마에', v:'두산위브파빌리온 1F', a:'종로구 (종각~광화문 사이)', x:310, y:475,
+    b:'오마카세 코스 전문',
+    desc:'차완무시·스시·온소면·모나카까지 이어지는 오마카세 코스. 점심·저녁 모두 코스제 운영.',
+    hours:'런치·디너 2회전', price:'런치 7~9만원 / 디너 13~18만원',
+    menu:'오마카세 코스 (트러플 차완무시 등)', tip:'종각역 2번 도보 5분, 광화문역 2번 10분.' },
+  { id:'j3', n:'스시 미치루', v:'이마빌딩 B1', a:'종로구 종로1길 42', x:340, y:455,
+    b:'광화문~안국 오마카세',
+    desc:'광화문-안국 중간 지하 1층 오마카세 스시. 정갈한 구성과 합리적 가격대.',
+    hours:'월~토 12:00-21:30 (일 휴무)', price:'런치 8만원 / 디너 15~22만원',
+    menu:'제철 오마카세 스시·사시미', tip:'캐치테이블 예약 권장.' },
+  { id:'j4', n:'스시 와 (Sushi Wa)', v:'광화문 빌딩', a:'종로구 광화문', x:370, y:460,
+    b:'광화문 오마카세 미들급',
+    desc:'광화문 지역 오마카세 스시 인기 매장. 런치 코스 가성비로 알려짐.',
+    hours:'런치·디너 (예약제)', price:'런치 6~8만원 / 디너 11~16만원',
+    menu:'오마카세 스시 10~15피스', tip:'캐치테이블/전화 예약.' },
+  { id:'j5', n:'이치란 라멘 명동점', v:'명동 상가', a:'중구 명동', x:625, y:720,
+    b:'일본 정통 돈코츠 라멘',
+    desc:'일본 후쿠오카 본점의 글로벌 체인 라멘. 개인 부스에서 집중해 먹는 독특한 콘셉트.',
+    hours:'매일 10:30-23:00', price:'라멘 1.5~1.9만원',
+    menu:'천연 돈코츠 라멘, 챠슈', tip:'매운맛·면 굵기·토핑 개인 주문지 작성.' },
+
+  // 중식 c1-c5
+  { id:'c1', n:'딘타이펑 명동중앙점', v:'명동 중앙 빌딩', a:'중구 명동', x:550, y:725,
+    b:'대만 샤오롱바오 세계 10대 레스토랑',
+    desc:'대만 정통 샤오롱바오와 딤섬 전문. NYT 선정 세계 10대 레스토랑 중 하나. 명동중앙점은 대표 지점.',
+    hours:'매일 11:00-22:00', price:'1인 3~6만원',
+    menu:'샤오롱바오, 새우볶음밥, 딤섬 세트', tip:'피크시간 웨이팅. 대만식 정통.' },
+  { id:'c2', n:'크리스탈제이드 광화문 상하이팰리스점', v:'서머셋팰리스 1F', a:'종로구 율곡로2길 7', x:660, y:355,
+    b:'광둥식·딤섬 프리미엄 체인', phone:'02-720-0133',
+    desc:'싱가포르 크리스탈제이드 그룹의 광화문 지점. 광둥식과 상하이식 딤섬이 시그니처.',
+    hours:'런치 11:30-15:30 / 디너 17:30-22:00', price:'1인 5~12만원',
+    menu:'딤섬 세트, 베이징덕, 샤오롱바오', tip:'캐치테이블 예약. 비즈니스 런치 적합.' },
+  { id:'c3', n:'신승관', v:'종로1가 24 빌딩 2F', a:'종로구 종로1가', x:275, y:468,
+    b:'중식 노포 (1964~, 3대째)',
+    desc:'1964년 개업한 60년 전통의 중식 노포. 3대째 가업 운영. 광화문 직장인 터줏대감.',
+    hours:'매일 11:00-23:00 (B/T 15:00-16:30, 일 휴무)', price:'1인 2~5만원',
+    menu:'짜장면, 짬뽕, 탕수육, 류산슬', tip:'노포 감성. 점심 대기 있음.' },
+  { id:'c4', n:'진아춘 광화문점', v:'광화문 오피시아 B1', a:'종로구 새문안로 92', x:385, y:475,
+    b:'광화문 직장인 중식 맛집', phone:'02-720-0688',
+    desc:'광화문 오피시아 지하의 정통 중식당. 점심 세트와 짬뽕·깐풍기가 인기.',
+    hours:'월~금 11:00-21:20 / 토 11:00-20:00 (B/T 14:30-17:00, 일 휴무)', price:'1인 1.5~4만원',
+    menu:'짬뽕, 깐풍기, 짜장면, 양장피', tip:'광화문 런치 피크 대기.' },
+  { id:'c5', n:'라오베이징 종로점', v:'종로 빌딩', a:'종로구 종로', x:480, y:495,
+    b:'정통 북경식 중화요리',
+    desc:'베이징 출신 셰프의 정통 북경식 중화. 베이징덕과 완탕이 시그니처.',
+    hours:'매일 11:00-22:00', price:'1인 3~8만원',
+    menu:'베이징덕, 완탕, 마파두부', tip:'베이징덕은 2~3인 사전 주문.' },
+
+  // 동남아 s1-s5 (베트남·태국·아시아 퓨전)
+  { id:'s1', n:'띤띤 광화문 (Tin Tin)', v:'SFC몰 B2', a:'중구 세종대로 136', x:490, y:580,
+    b:'베트남 현지풍 · 루이비통 가이드 등재',
+    desc:'베트남 현지 식당 분위기의 쌀국수·분짜 전문점. 루이비통 시티가이드 서울 2019 등재.',
+    hours:'매일 11:30-21:30 (B/T 15:00-17:00)', price:'1인 1.5~2.5만원',
+    menu:'분짜, 매운해산물 쌀국수, 월남쌈', tip:'SFC 지하 B2. 직장인 런치 인기.' },
+  { id:'s2', n:'에머이 종각점', v:'종각 빌딩', a:'종로구 종로 (종각역)', x:425, y:503,
+    b:'하노이식 베트남 쌀국수',
+    desc:'하노이 스타일 베트남 체인 대표점. 종각점은 런치 직장인 수요 많음.',
+    hours:'매일 11:00-22:00', price:'1인 1.2~2.2만원',
+    menu:'분짜, 쌀국수 퍼보, 바인미', tip:'광화문·시청 동선과 연결.' },
+  { id:'s3', n:'미분당 시청점', v:'시청 빌딩 1F', a:'중구 시청', x:400, y:635,
+    b:'베트남 쌀국수 프랜차이즈',
+    desc:'국내 30여개 매장을 운영하는 베트남 쌀국수 브랜드. 한국인 입맛에 맞춘 깔끔한 육수.',
+    hours:'매일 11:00-22:00', price:'쌀국수 9~1.3만원',
+    menu:'양지 쌀국수, 차돌 쌀국수, 짜조', tip:'가벼운 점심·저녁. 혼밥 가능.' },
+  { id:'s4', n:'남박', v:'서촌 한옥 인근', a:'종로구 서촌 (누하동 인근)', x:440, y:410,
+    b:'남준영 셰프 정통 베트남',
+    desc:'베트남 현지 셰프 남준영 대표의 정통 북부 베트남 요리. 분짜하노이와 쌀국수가 대표작.',
+    hours:'매일 11:00-21:30 (B/T)', price:'1인 1.5~3만원',
+    menu:'분짜 하노이, 쌀국수, 월남쌈', tip:'서촌 산책과 함께. 주말 대기 있음.' },
+  { id:'s5', n:'에머이 광화문점', v:'광화문 오피스', a:'종로구 광화문', x:400, y:520,
+    b:'하노이식 베트남 (지점)',
+    desc:'에머이 체인의 광화문 지점. 직장인 점심 수요 중심, 합리적 가격대.',
+    hours:'매일 11:00-22:00', price:'1인 1.2~2.2만원',
+    menu:'쌀국수, 분짜, 바인미', tip:'광화문 오피스 런치 단골.' },
+
+  // 유럽식 e1-e5 (이탈리안·프렌치)
+  { id:'e1', n:'라칸티나 (La Cantina)', v:'삼성빌딩 B1', a:'중구 을지로 19 (을지로1가)', x:470, y:650,
+    b:'국내 최초 이탈리안 (1967~), 서울미래유산', phone:'02-777-2579',
+    desc:'1967년 이병철 회장 권유로 개업한 국내 최초의 이탈리안 레스토랑. 서울미래유산 지정. 롯데호텔 건너편.',
+    hours:'주중 11:30-23:00 (B/T 있음)', price:'1인 4~10만원',
+    menu:'클래식 파스타, 스테이크, 이탈리아 와인', tip:'올드스쿨 정통 감성. 기념일 적합.' },
+  { id:'e2', n:'까사디쉐프 광화문', v:'광화문 빌딩', a:'종로구 광화문', x:355, y:505,
+    b:'이탈리안 (평점 4.3)',
+    desc:'광화문 지역 이탈리안 맛집. 홈메이드 파스타와 피자, 와인 페어링.',
+    hours:'런치·디너', price:'1인 3~6만원',
+    menu:'트러플 파스타, 화덕 피자, 스테이크', tip:'광화문 저녁 데이트 코스.' },
+  { id:'e3', n:'뽐모도로 광화문점', v:'광화문 빌딩', a:'종로구 광화문', x:400, y:540,
+    b:'크림 스파게티 유명 이탈리안',
+    desc:'광화문 직장인 이탈리안. 진한 크림 스파게티로 유명.',
+    hours:'매일 11:00-22:00', price:'1인 2~4만원',
+    menu:'크림 스파게티, 봉골레, 피자', tip:'점심 프리픽스 가성비.' },
+  { id:'e4', n:'디미 (dimi)', v:'서촌 한옥 골목', a:'종로구 서촌 (경복궁 서측)', x:395, y:415,
+    b:'생면 파스타 전문 이탈리안',
+    desc:'서촌의 생면 파스타 전문점. 매일 반죽한 홈메이드 파스타가 일품.',
+    hours:'런치·디너 (B/T 있음)', price:'1인 2.5~5만원',
+    menu:'생면 까르보나라, 라구 파파르델레', tip:'서촌 산책과 함께. 예약 권장.' },
+  { id:'e5', n:'비스트로 서울 광화문점', v:'광화문 빌딩', a:'종로구 광화문', x:365, y:530,
+    b:'프렌치 비스트로',
+    desc:'광화문 지역의 캐주얼 프렌치 비스트로. 스테이크 프리트와 에스카르고가 인기.',
+    hours:'매일 11:00-22:00', price:'1인 3~6만원',
+    menu:'스테이크 프리트, 에스카르고, 크렘브륄레', tip:'프렌치 입문 코스.' },
+];
+
+let visited = JSON.parse(localStorage.getItem('sj_visited') || '[]');
+let visits = JSON.parse(localStorage.getItem('sj_visits') || '{}');
+let customR = JSON.parse(localStorage.getItem('sj_custom') || '[]');
+let filter = 'all';
+let activeCourse = null;
+
+const COURSES = [
+  { id:'lunch', icon:'🌅', title:'광화문 직장인 런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
+  { id:'hanok', icon:'🏛️', title:'북촌·서촌 한옥 투어', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
+  { id:'night', icon:'🌙', title:'명동 야식 투어', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
+  { id:'michelin', icon:'🥇', title:'미쉐린 코스', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
+  { id:'nopo', icon:'🕰️', title:'50년+ 노포 투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
+];
+
+const pinsG = document.getElementById('pins');
+const listEl = document.getElementById('list');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function getAllR() { return [...R, ...customR]; }
+function getCat(r) { return r.cat || r.id[0]; }
+
+function saveAll() {
+  localStorage.setItem('sj_visited', JSON.stringify(visited));
+  localStorage.setItem('sj_visits', JSON.stringify(visits));
+  localStorage.setItem('sj_custom', JSON.stringify(customR));
+}
+
+function getOpenStatus(hours) {
+  if (!hours) return null;
+  const now = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const ranges = [];
+  const re = /(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/g;
+  let m;
+  while ((m = re.exec(hours)) !== null) {
+    const s = parseInt(m[1])*60 + parseInt(m[2]);
+    let e = parseInt(m[3])*60 + parseInt(m[4]);
+    if (e < s) e += 24*60;
+    ranges.push([s, e]);
+  }
+  if (!ranges.length) return null;
+  for (const [s, e] of ranges) {
+    if (mins >= s && mins <= e) {
+      const rem = e - mins;
+      if (rem <= 30) return { cls:'closing', label:`⏰ ${rem}분 후 마감` };
+      return { cls:'open', label:'🟢 영업 중' };
+    }
+  }
+  for (let i = 0; i < ranges.length - 1; i++) {
+    if (mins > ranges[i][1] && mins < ranges[i+1][0]) {
+      return { cls:'break', label:'🟡 브레이크' };
+    }
+  }
+  return { cls:'closed', label:'⚫ 영업 종료' };
+}
+
+function buildUrls(r) {
+  const q = encodeURIComponent(`${r.n} ${r.a||''}`);
+  return {
+    kakao: `https://map.kakao.com/?q=${q}`,
+    catchtable: `https://app.catchtable.co.kr/ct/search?keyword=${encodeURIComponent(r.n)}`,
+    tel: r.phone ? `tel:${r.phone.replace(/-/g,'')}` : null
+  };
+}
+
+function renderPins() {
+  pinsG.innerHTML = '';
+  getAllR().forEach(r => {
+    const c = getCat(r);
+    if (!r.x || !r.y) return;
+    const g = document.createElementNS(SVG_NS, 'g');
+    g.setAttribute('class', 'pin-group' + (visited.includes(r.id) ? ' visited' : ''));
+    g.setAttribute('transform', `translate(${r.x}, ${r.y})`);
+    g.setAttribute('data-id', r.id);
+
+    // 투명 히트박스 (터치 타겟 확대)
+    const hit = document.createElementNS(SVG_NS, 'circle');
+    hit.setAttribute('r', 22);
+    hit.setAttribute('class', 'pin-hit');
+    g.appendChild(hit);
+
+    const circ = document.createElementNS(SVG_NS, 'circle');
+    circ.setAttribute('r', 15);
+    circ.setAttribute('fill', COLORS[c]);
+    circ.setAttribute('stroke', '#2a1a08');
+    circ.setAttribute('stroke-width', 2);
+    circ.setAttribute('class', 'pin-fill');
+    g.appendChild(circ);
+
+    const t = document.createElementNS(SVG_NS, 'text');
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('y', 5);
+    t.setAttribute('fill', c === 'w' ? '#3a2a10' : '#fff');
+    t.setAttribute('font-weight', '900');
+    t.setAttribute('font-size', 14);
+    t.setAttribute('pointer-events', 'none');
+    t.textContent = r.id.slice(1);
+    g.appendChild(t);
+
+    g.addEventListener('click', () => scrollToCard(r.id));
+    pinsG.appendChild(g);
+  });
+}
+
+function toggleMap() {
+  const panel = document.getElementById('mapPanel');
+  const btn = document.getElementById('mapToggle');
+  panel.classList.toggle('collapsed');
+  btn.textContent = panel.classList.contains('collapsed') ? '🗺️ 지도 펼치기' : '🗺️ 지도 접기';
+}
+
+function renderList() {
+  listEl.innerHTML = '';
+  const groups = { w:[], k:[], j:[], c:[], s:[], e:[] };
+  const all = getAllR();
+  all.forEach(r => {
+    const c = getCat(r);
+    const courseIds = activeCourse ? COURSES.find(x => x.id === activeCourse)?.ids : null;
+    if (courseIds && !courseIds.includes(r.id)) return;
+    if (filter === 'all' || filter === c || (filter === 'todo' && !visited.includes(r.id))) {
+      if (!groups[c]) groups[c] = [];
+      groups[c].push(r);
+    }
+  });
+
+  Object.keys(groups).forEach(c => {
+    if (!groups[c].length) return;
+    const head = document.createElement('div');
+    head.className = 'cuisine-head ' + c;
+    const doneCount = groups[c].filter(r => visited.includes(r.id)).length;
+    head.innerHTML = `${CUISINES[c]} <span class="count">${doneCount} / ${groups[c].length} 완료</span>`;
+    listEl.appendChild(head);
+
+    groups[c].forEach(r => {
+      const isV = visited.includes(r.id);
+      const card = document.createElement('div');
+      card.className = 'card' + (isV ? ' visited' : '');
+      card.dataset.id = r.id;
+      const urls = buildUrls(r);
+      const status = getOpenStatus(r.hours);
+      const v = visits[r.id];
+      const isCustom = r.custom;
+      card.innerHTML = `
+        <div class="card-top">
+          <input type="checkbox" class="card-check" ${isV?'checked':''}>
+          <div class="card-num ${c}">${isCustom ? '★' : r.id.slice(1)}</div>
+          <div class="card-info">
+            <div class="card-name">${r.n} ${isCustom?'<span class="custom-badge">내 맛집</span>':''}</div>
+            <div class="card-meta">${r.v||''}${r.v && r.a?' · ':''}${r.a||''}</div>
+          </div>
+          ${status ? `<div class="status-badge ${status.cls}">${status.label}</div>` : ''}
+          <div class="card-arrow">›</div>
+        </div>
+        ${r.b ? `<div class="card-brief">${r.b}</div>` : ''}
+        <div class="card-actions">
+          ${urls.tel ? `<a class="qa phone" href="${urls.tel}" onclick="event.stopPropagation()">📞 전화</a>` : ''}
+          <a class="qa map" href="${urls.kakao}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺️ 지도</a>
+          <a class="qa book" href="${urls.catchtable}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📅 예약</a>
+          ${isCustom ? `<button class="qa" onclick="event.stopPropagation(); removeCustom('${r.id}')" style="border-color:#d85a5a;color:#7a2020;">🗑️ 삭제</button>` : ''}
+        </div>
+        ${v ? `
+          <div class="visit-record">
+            <div class="stars">${'★'.repeat(v.rating||0)}${'☆'.repeat(5-(v.rating||0))}</div>
+            <div class="visit-date">${v.date||''}</div>
+            <div class="visit-memo">${v.memo ? '"'+v.memo+'"' : ''}</div>
+            <button class="edit-visit" onclick="event.stopPropagation(); openVisitModal('${r.id}')">수정</button>
+          </div>
+        ` : ''}
+        ${(r.desc || r.hours || r.price || r.menu || r.tip) ? `
+          <div class="card-detail">
+            <dl>
+              ${r.desc ? `<dt>📝 설명</dt><dd>${r.desc}</dd>` : ''}
+              ${r.hours ? `<dt>🕒 영업</dt><dd>${r.hours}</dd>` : ''}
+              ${r.price ? `<dt>💰 가격</dt><dd>${r.price}</dd>` : ''}
+              ${r.menu ? `<dt>🍽️ 메뉴</dt><dd>${r.menu}</dd>` : ''}
+              ${r.tip ? `<dt>💡 팁</dt><dd>${r.tip}</dd>` : ''}
+              ${r.phone ? `<dt>📞 전화</dt><dd>${r.phone}</dd>` : ''}
+            </dl>
+          </div>
+        ` : ''}`;
+
+      const check = card.querySelector('.card-check');
+      check.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleVisit(r.id);
+      });
+      card.querySelector('.card-top').addEventListener('click', e => {
+        if (e.target === check) return;
+        card.classList.toggle('expanded');
+      });
+      listEl.appendChild(card);
+    });
+  });
+}
+
+function renderCourses() {
+  const row = document.getElementById('courseRow');
+  const banner = document.getElementById('courseBanner');
+  row.innerHTML = COURSES.map(c => {
+    const done = c.ids.filter(id => visited.includes(id)).length;
+    return `<div class="course-card ${activeCourse===c.id?'active':''}" onclick="toggleCourse('${c.id}')">
+      <div class="c-icon">${c.icon}</div>
+      <div class="c-title">${c.title}</div>
+      <div class="c-desc">${c.desc}</div>
+      <div class="c-count">${done}/${c.ids.length} 완료</div>
+    </div>`;
+  }).join('');
+
+  if (activeCourse) {
+    const c = COURSES.find(x => x.id === activeCourse);
+    banner.innerHTML = `<div class="course-banner">
+      <button class="close-course" onclick="toggleCourse(null)">×</button>
+      ${c.icon} <strong>${c.title}</strong> · ${c.desc} (${c.ids.length}곳)
+    </div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+}
+
+function toggleCourse(cid) {
+  activeCourse = (activeCourse === cid) ? null : cid;
+  renderCourses();
+  renderList();
+  renderPins();
+}
+
+/* ===== 지도 확대 모드 ===== */
+function toggleFullscreen() {
+  const panel = document.getElementById('mapPanel');
+  const isFs = panel.classList.toggle('fullscreen');
+  if (isFs) {
+    renderMapSidebar();
+    document.body.style.overflow = 'hidden';
+    // viewBox 초기화
+    const svg = panel.querySelector('svg');
+    if (svg && svg._baseVB) svg.setAttribute('viewBox', svg._baseVB.join(' '));
+  } else {
+    document.body.style.overflow = '';
+  }
+}
+
+function renderMapSidebar() {
+  const sidebar = document.getElementById('mapSidebar');
+  const all = getAllR();
+  const done = visited.length;
+  const total = all.length;
+  const pct = Math.round((done/total)*100);
+
+  const groups = { w:[], k:[], j:[], c:[], s:[], e:[] };
+  all.forEach(r => {
+    const c = getCat(r);
+    if (!groups[c]) groups[c] = [];
+    groups[c].push(r);
+  });
+
+  let html = `
+    <h3>
+      📍 맛집 지도
+      <button class="close-fs" onclick="toggleFullscreen()">×</button>
+    </h3>
+    <div class="ms-progress">
+      <div class="big">${done} / ${total}</div>
+      <div>${pct}% 완료 · 핀을 탭하면 이동</div>
+    </div>
+  `;
+
+  Object.keys(groups).forEach(c => {
+    if (!groups[c].length) return;
+    const ds = groups[c].filter(r => visited.includes(r.id)).length;
+    html += `<div class="ms-cat ${c}">${CUISINES[c]} (${ds}/${groups[c].length})</div>`;
+    groups[c].forEach(r => {
+      const isV = visited.includes(r.id);
+      const num = r.custom ? '★' : r.id.slice(1);
+      html += `<div class="ms-pin ${isV?'visited':''}" onclick="focusPin('${r.id}')">
+        <div class="dot" style="background:${COLORS[c]};color:${c==='w'?'#3a2a10':'#fff'}">${num}</div>
+        <div class="nm">${r.n}</div>
+        ${isV?'<div class="chk">✓</div>':''}
+      </div>`;
+    });
+  });
+  sidebar.innerHTML = html;
+}
+
+function focusPin(id) {
+  const r = getAllR().find(x => x.id === id);
+  if (!r || !r.x) return;
+  const svg = document.querySelector('.map-panel svg');
+  if (!svg) return;
+  // 포커스 viewBox
+  svg.setAttribute('viewBox', `${r.x-180} ${r.y-130} 360 260`);
+  // 핀 강조
+  document.querySelectorAll('.pin-group').forEach(p => p.classList.remove('highlight'));
+  const pin = document.querySelector(`.pin-group[data-id="${id}"]`);
+  if (pin) {
+    pin.classList.add('highlight');
+    setTimeout(() => pin.classList.remove('highlight'), 3000);
+  }
+}
+
+// ESC로 확대 모드 종료
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const panel = document.getElementById('mapPanel');
+    if (panel.classList.contains('fullscreen')) toggleFullscreen();
+  }
+});
+
+function toggleVisit(id) {
+  const i = visited.indexOf(id);
+  if (i >= 0) {
+    visited.splice(i, 1);
+    delete visits[id];
+    saveAll();
+    render();
+  } else {
+    visited.push(id);
+    saveAll();
+    openVisitModal(id);
+    render();
+  }
+}
+
+/* ========== 방문 기록 모달 ========== */
+let currentVisitId = null;
+function openVisitModal(id) {
+  currentVisitId = id;
+  const r = getAllR().find(x => x.id === id);
+  const v = visits[id] || {};
+  document.getElementById('visitModalTitle').textContent = `🎉 ${r.n}`;
+  document.getElementById('visitDate').value = v.date || new Date().toISOString().slice(0,10);
+  document.getElementById('visitMemo').value = v.memo || '';
+  renderRating(v.rating || 0);
+  document.getElementById('visitModal').classList.add('show');
+}
+function closeVisitModal() {
+  document.getElementById('visitModal').classList.remove('show');
+  currentVisitId = null;
+}
+function skipVisit() { closeVisitModal(); }
+let selectedRating = 0;
+function renderRating(r) {
+  selectedRating = r;
+  const box = document.getElementById('ratingInput');
+  box.innerHTML = '';
+  for (let i = 1; i <= 5; i++) {
+    const s = document.createElement('span');
+    s.className = 'star' + (i <= r ? ' filled' : '');
+    s.textContent = '★';
+    s.onclick = () => renderRating(i);
+    box.appendChild(s);
+  }
+}
+function saveVisit() {
+  if (!currentVisitId) return;
+  visits[currentVisitId] = {
+    date: document.getElementById('visitDate').value,
+    rating: selectedRating,
+    memo: document.getElementById('visitMemo').value.trim()
+  };
+  saveAll();
+  closeVisitModal();
+  render();
+}
+
+/* ========== 룰렛 ========== */
+function openRoulette() {
+  const all = getAllR();
+  const unvisited = all.filter(r => !visited.includes(r.id));
+  if (!unvisited.length) {
+    alert('🎉 모든 맛집 방문 완료! 추가 맛집을 등록해보세요.');
+    return;
+  }
+  const modal = document.getElementById('rouletteModal');
+  modal.classList.add('show');
+  const display = document.getElementById('rouletteDisplay');
+  const chosen = unvisited[Math.floor(Math.random() * unvisited.length)];
+  let spins = 18;
+  function spin() {
+    if (spins > 0) {
+      const r = unvisited[Math.floor(Math.random() * unvisited.length)];
+      display.innerHTML = `<div class="slot">${r.n}</div><div class="slot-sub">${CUISINES[getCat(r)]} · ${r.a||''}</div>`;
+      spins--;
+      setTimeout(spin, 70 + (18 - spins) * 12);
+    } else {
+      display.innerHTML = `
+        <div class="slot final">${chosen.n}</div>
+        <div class="slot-sub">${CUISINES[getCat(chosen)]} · ${chosen.a||''}</div>
+        <button class="go-btn" onclick="goToRouletteChoice('${chosen.id}')">가볼까요? →</button>`;
+    }
+  }
+  spin();
+}
+function closeRoulette() {
+  document.getElementById('rouletteModal').classList.remove('show');
+}
+function goToRouletteChoice(id) {
+  closeRoulette();
+  scrollToCard(id);
+}
+
+/* ========== 커스텀 추가 ========== */
+function openCustomForm() {
+  ['cmName','cmArea','cmDesc','cmPhone'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cmCat').value = 'w';
+  document.getElementById('customModal').classList.add('show');
+}
+function closeCustomModal() {
+  document.getElementById('customModal').classList.remove('show');
+}
+function saveCustom() {
+  const name = document.getElementById('cmName').value.trim();
+  if (!name) { alert('식당 이름을 입력하세요.'); return; }
+  const cat = document.getElementById('cmCat').value;
+  const area = document.getElementById('cmArea').value.trim();
+  const desc = document.getElementById('cmDesc').value.trim();
+  const phone = document.getElementById('cmPhone').value.trim();
+  // 지도 중앙 근처 좌표 (랜덤 미세 오프셋)
+  const x = 500 + Math.random()*200 - 100;
+  const y = 550 + Math.random()*150 - 75;
+  const id = 'u' + Date.now();
+  customR.push({
+    id, cat, n: name, v: '사용자 추가', a: area, x, y,
+    b: desc || '내가 추가한 맛집', desc, hours:'', price:'', menu:'', tip:'',
+    phone: phone || null, custom: true
+  });
+  saveAll();
+  closeCustomModal();
+  render();
+}
+function removeCustom(id) {
+  if (!confirm('이 맛집을 삭제할까요?')) return;
+  customR = customR.filter(r => r.id !== id);
+  const vi = visited.indexOf(id);
+  if (vi >= 0) visited.splice(vi, 1);
+  delete visits[id];
+  saveAll();
+  render();
+}
+
+function scrollToCard(id) {
+  if (filter !== 'all' && filter !== id[0] && !(filter === 'todo' && !visited.includes(id))) {
+    filter = 'all';
+    document.querySelectorAll('.filters button').forEach(b => b.classList.toggle('active', b.dataset.f === 'all'));
+  }
+  renderList();
+  setTimeout(() => {
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) {
+      document.querySelectorAll('.card.highlight').forEach(c => c.classList.remove('highlight'));
+      card.classList.add('highlight', 'expanded');
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+      setTimeout(() => card.classList.remove('highlight'), 2500);
+    }
+  }, 50);
+}
+
+function updateProgress() {
+  const total = getAllR().length;
+  const pct = (visited.length / total) * 100;
+  document.getElementById('pbar').style.width = pct + '%';
+  document.getElementById('pText').textContent = `${visited.length} / ${total}`;
+}
+
+function render() {
+  renderPins();
+  renderCourses();
+  renderList();
+  updateProgress();
+}
+
+document.querySelectorAll('.filters button').forEach(b => {
+  b.addEventListener('click', () => {
+    filter = b.dataset.f;
+    document.querySelectorAll('.filters button').forEach(x => x.classList.toggle('active', x === b));
+    renderList();
+  });
+});
+
+render();
+
+/* ===== PWA: Service Worker 등록 ===== */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW 등록 실패:', err));
+  });
+}
+
+/* ===== 앱 설치 프롬프트 (Android) ===== */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'inline-block';
+});
+function installApp() {
+  if (!deferredPrompt) {
+    alert('iOS: 공유 버튼 → "홈 화면에 추가"\nAndroid: 주소창 오른쪽 메뉴 → "앱 설치"');
+    return;
+  }
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+  });
+}
+
+/* ===== SVG 핀치 줌·팬 ===== */
+(function() {
+  const svg = document.querySelector('.map-panel svg');
+  if (!svg) return;
+  const baseVB = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+  svg._baseVB = baseVB;
+  svg.addEventListener('dblclick', () => svg.setAttribute('viewBox', baseVB.join(' ')));
+  let vb = [...baseVB];
+  let touches = [];
+  let isPanning = false;
+  let lastPoint = null;
+  let lastDist = 0;
+
+  function applyVB() {
+    svg.setAttribute('viewBox', vb.join(' '));
+  }
+  function clamp() {
+    const [bx,by,bw,bh] = baseVB;
+    if (vb[2] > bw) vb[2] = bw;
+    if (vb[3] > bh) vb[3] = bh;
+    if (vb[2] < bw*0.3) vb[2] = bw*0.3;
+    if (vb[3] < bh*0.3) vb[3] = bh*0.3;
+    if (vb[0] < bx) vb[0] = bx;
+    if (vb[1] < by) vb[1] = by;
+    if (vb[0]+vb[2] > bx+bw) vb[0] = bx+bw-vb[2];
+    if (vb[1]+vb[3] > by+bh) vb[1] = by+bh-vb[3];
+  }
+  function distance(a, b) {
+    return Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+  }
+  function toSVG(clientX, clientY) {
+    const rect = svg.getBoundingClientRect();
+    const sx = (clientX - rect.left) / rect.width;
+    const sy = (clientY - rect.top) / rect.height;
+    return { x: vb[0] + sx * vb[2], y: vb[1] + sy * vb[3] };
+  }
+
+  let pinching = false;
+  let lastTap = 0;
+
+  svg.addEventListener('touchstart', (e) => {
+    touches = [...e.touches];
+    if (touches.length === 2) {
+      e.preventDefault();
+      pinching = true;
+      lastDist = distance(touches[0], touches[1]);
+    } else if (touches.length === 1) {
+      e.preventDefault();
+      isPanning = true;
+      lastPoint = { x: touches[0].clientX, y: touches[0].clientY };
+    }
+  }, { passive: false });
+
+  svg.addEventListener('touchmove', (e) => {
+    const t = [...e.touches];
+    if (t.length === 2) {
+      e.preventDefault();
+      pinching = true;
+      const d = distance(t[0], t[1]);
+      if (d === 0 || lastDist === 0) { lastDist = d; return; }
+      const scale = lastDist / d;
+      const cx = (t[0].clientX + t[1].clientX) / 2;
+      const cy = (t[0].clientY + t[1].clientY) / 2;
+      const rect = svg.getBoundingClientRect();
+      const center = toSVG(cx, cy);
+      const newW = vb[2] * scale;
+      const newH = vb[3] * scale;
+      vb[0] = center.x - (cx - rect.left) / rect.width * newW;
+      vb[1] = center.y - (cy - rect.top) / rect.height * newH;
+      vb[2] = newW;
+      vb[3] = newH;
+      clamp();
+      applyVB();
+      lastDist = d;
+    } else if (t.length === 1 && isPanning && lastPoint && !pinching) {
+      e.preventDefault();
+      const rect = svg.getBoundingClientRect();
+      const dx = (t[0].clientX - lastPoint.x) / rect.width * vb[2];
+      const dy = (t[0].clientY - lastPoint.y) / rect.height * vb[3];
+      vb[0] -= dx;
+      vb[1] -= dy;
+      clamp();
+      applyVB();
+      lastPoint = { x: t[0].clientX, y: t[0].clientY };
+    }
+  }, { passive: false });
+
+  svg.addEventListener('touchend', (e) => {
+    // 모든 손가락 떼짐
+    if (e.touches.length === 0) {
+      const wasPinching = pinching;
+      pinching = false;
+      isPanning = false;
+      lastPoint = null;
+      lastDist = 0;
+      touches = [];
+
+      // 핀치 직후엔 더블탭 검사 건너뛰기
+      if (!wasPinching) {
+        const now = Date.now();
+        if (now - lastTap < 300 && lastTap !== 0) {
+          vb = [...baseVB];
+          applyVB();
+          lastTap = 0;
+        } else {
+          lastTap = now;
+        }
+      } else {
+        lastTap = 0;
+      }
+    } else if (e.touches.length === 1) {
+      // 핀치 중 한 손가락만 남음 → 팬 모드 재진입 방지
+      lastPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  });
+
+  // 데스크톱 휠 줌
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = svg.getBoundingClientRect();
+    const cx = e.clientX, cy = e.clientY;
+    const center = toSVG(cx, cy);
+    const scale = e.deltaY > 0 ? 1.15 : 0.87;
+    const newW = vb[2] * scale;
+    const newH = vb[3] * scale;
+    vb[0] = center.x - (cx - rect.left) / rect.width * newW;
+    vb[1] = center.y - (cy - rect.top) / rect.height * newH;
+    vb[2] = newW; vb[3] = newH;
+    clamp();
+    applyVB();
+  }, { passive: false });
+
+  // 데스크톱 드래그 팬 (마우스)
+  let mouseDown = null;
+  svg.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.pin-group')) return;
+    mouseDown = { x: e.clientX, y: e.clientY };
+    svg.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!mouseDown) return;
+    const rect = svg.getBoundingClientRect();
+    const dx = (e.clientX - mouseDown.x) / rect.width * vb[2];
+    const dy = (e.clientY - mouseDown.y) / rect.height * vb[3];
+    vb[0] -= dx; vb[1] -= dy;
+    clamp();
+    applyVB();
+    mouseDown = { x: e.clientX, y: e.clientY };
+  });
+  window.addEventListener('mouseup', () => {
+    mouseDown = null;
+    svg.style.cursor = '';
+  });
+})();
+</script>
+</body>
+</html>

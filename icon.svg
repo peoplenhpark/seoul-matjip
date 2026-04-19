@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fce9c4"/>
+      <stop offset="100%" stop-color="#d9a050"/>
+    </linearGradient>
+    <linearGradient id="pin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8752a"/>
+      <stop offset="100%" stop-color="#9a3810"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 (둥근 사각형, maskable 안전영역 고려) -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+
+  <!-- 한양도성 실루엣 (점선 타원) -->
+  <ellipse cx="256" cy="270" rx="170" ry="120" fill="none" stroke="#8a4a22" stroke-width="6" stroke-dasharray="14 8" opacity="0.5"/>
+
+  <!-- 산 실루엣 (상단) -->
+  <path d="M80,200 Q150,140 200,180 Q260,130 320,180 Q380,140 432,200 L432,220 L80,220 Z" fill="#87a878" opacity="0.85"/>
+
+  <!-- 메인 핀 (중앙 크게) -->
+  <g transform="translate(256,250)">
+    <path d="M0,-90 C55,-90 90,-55 90,0 C90,55 55,85 0,140 C-55,85 -90,55 -90,0 C-90,-55 -55,-90 0,-90 Z" fill="url(#pin)" stroke="#4a1808" stroke-width="5"/>
+    <!-- 포크·나이프 심볼 -->
+    <circle cx="0" cy="-8" r="40" fill="#fff6e0"/>
+    <!-- 수저 -->
+    <rect x="-20" y="-32" width="5" height="48" rx="2" fill="#6a4020"/>
+    <path d="M-28,-32 Q-28,-42 -22,-42 L-13,-42 Q-7,-42 -7,-32 L-7,-20 Q-7,-14 -13,-14 L-22,-14 Q-28,-14 -28,-20 Z" fill="#6a4020"/>
+    <!-- 젓가락 2개 -->
+    <rect x="10" y="-34" width="3.5" height="52" rx="1.5" fill="#6a4020"/>
+    <rect x="18" y="-34" width="3.5" height="52" rx="1.5" fill="#6a4020"/>
+  </g>
+
+  <!-- 텍스트 (4대문 안 맛집) -->
+  <text x="256" y="430" text-anchor="middle" font-family="'Gowun Dodum','Malgun Gothic',sans-serif" font-weight="900" font-size="52" fill="#4a2a10">서울 맛집</text>
+  <text x="256" y="465" text-anchor="middle" font-family="'Gowun Dodum','Malgun Gothic',sans-serif" font-weight="700" font-size="22" fill="#7a4a22">四大門內 30</text>
+</svg>

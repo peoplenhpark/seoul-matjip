@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>서울 4대문안 도로명 압축지도</title>
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #f0ece0;
+    font-family: 'Malgun Gothic', sans-serif;
+    text-align: center;
+  }
+  h1 { color: #3a2a1a; margin-bottom: 8px; }
+  .toolbar {
+    margin: 14px 0 22px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #6b4422;
+    background: #d9a76a;
+    color: #3a2a1a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+  }
+  button:hover { background: #e8b880; }
+  button.blue { background: #7fb3d9; border-color: #1e3a55; color: #fff; }
+  button.blue:hover { background: #5f9cc8; }
+  #map-container {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  svg { width: 100%; height: auto; display: block; }
+  .hint { color: #6a5a4a; font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <h1>서울 4대문안 도로명 압축지도</h1>
+  <div class="toolbar">
+    <button onclick="downloadSVG()">⬇ SVG 다운로드</button>
+    <button class="blue" onclick="downloadPNG(2)">⬇ PNG 다운로드 (2x 고화질)</button>
+    <button class="blue" onclick="downloadPNG(1)">⬇ PNG 다운로드 (1x)</button>
+    <button onclick="window.print()">🖨 인쇄</button>
+  </div>
+  <div id="map-container">
+    <object id="svg-obj" type="image/svg+xml" data="seoul_4daemun.svg"></object>
+  </div>
+  <p class="hint">SVG는 무손실 벡터라 확대해도 깨지지 않습니다. PNG는 카톡·메모장 첨부용으로 편합니다.</p>
+
+<script>
+async function fetchSVGText() {
+  const res = await fetch('seoul_4daemun.svg');
+  return await res.text();
+}
+
+async function downloadSVG() {
+  const text = await fetchSVGText();
+  const blob = new Blob([text], {type: 'image/svg+xml'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'seoul_4daemun.svg';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function downloadPNG(scale) {
+  const svgText = await fetchSVGText();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgText, 'image/svg+xml');
+  const svgEl = doc.documentElement;
+  const vb = svgEl.getAttribute('viewBox').split(' ').map(Number);
+  const w = vb[2], h = vb[3];
+
+  const blob = new Blob([svgText], {type: 'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fbf5e6';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((pngBlob) => {
+      const pngUrl = URL.createObjectURL(pngBlob);
+      const a = document.createElement('a');
+      a.href = pngUrl;
+      a.download = `seoul_4daemun_${scale}x.png`;
+      a.click();
+      URL.revokeObjectURL(pngUrl);
+    }, 'image/png');
+  };
+  img.src = url;
+}
+</script>
+</body>
+</html>

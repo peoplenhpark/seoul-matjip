@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>OG 이미지 PNG 생성</title>
+<style>
+  body { font-family: sans-serif; background: #fef6e0; padding: 30px; text-align: center; }
+  h1 { color: #5a3a1a; }
+  button { padding: 14px 28px; font-size: 16px; font-weight: 900; background: #e8a848; color: #3a2a10; border: none; border-radius: 24px; cursor: pointer; margin: 10px; }
+  button:hover { background: #d88838; }
+  #preview { max-width: 600px; border: 2px solid #8a5a28; border-radius: 8px; margin: 20px auto; display: block; }
+  p { color: #7a5a32; }
+  .hint { background: #fff4de; border-left: 4px solid #e8a848; padding: 12px 16px; max-width: 640px; margin: 20px auto; text-align: left; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>🖼️ OG 이미지 PNG 변환기</h1>
+<p>카카오톡 공유 미리보기용 <strong>og-image.png</strong>(1200×630)를 다운로드합니다.</p>
+<p><em>file:// 환경에서도 작동하도록 SVG 인라인 버전입니다.</em></p>
+
+<button onclick="convert()">⬇ og-image.png 다운로드</button>
+
+<div id="svgWrap">
+  <!-- Inline SVG (og-image.svg와 동일) -->
+  <svg id="ogsvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" font-family="'Gowun Dodum','Malgun Gothic',sans-serif" width="600">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#fff6e0"/>
+        <stop offset="100%" stop-color="#f5d39c"/>
+      </linearGradient>
+    </defs>
+    <rect width="1200" height="630" fill="url(#bg)"/>
+    <path d="M0,140 Q150,70 280,120 Q420,60 560,120 Q700,70 840,125 Q980,70 1120,130 L1200,130 L1200,180 L0,180 Z" fill="#a8c49c" opacity="0.6"/>
+    <ellipse cx="950" cy="380" rx="180" ry="140" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="10 6" opacity="0.55"/>
+    <g transform="translate(900,280)"><circle r="28" fill="#e8a848" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#3a2a10">🍖</text></g>
+    <g transform="translate(1000,280)"><circle r="28" fill="#c05a3a" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🍚</text></g>
+    <g transform="translate(1100,320)"><circle r="28" fill="#e07a92" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🍣</text></g>
+    <g transform="translate(850,400)"><circle r="28" fill="#d04040" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🥢</text></g>
+    <g transform="translate(970,460)"><circle r="28" fill="#70a860" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🌶️</text></g>
+    <g transform="translate(1080,460)"><circle r="28" fill="#8870d0" stroke="#2a1a08" stroke-width="3"/><text text-anchor="middle" y="9" font-size="24" font-weight="900" fill="#fff">🥐</text></g>
+    <text x="60" y="200" font-size="38" font-weight="900" fill="#5a3a1a">🍽️ 서울 4대문 안</text>
+    <text x="60" y="280" font-size="72" font-weight="900" fill="#3a2a10">맛집 체크리스트</text>
+    <text x="60" y="335" font-size="26" font-weight="700" fill="#7a5a32">광화문 · 서촌 · 북촌 · 명동 · 을지로 · 종로</text>
+    <g font-size="24" font-weight="700" fill="#5a3a1a">
+      <circle cx="75" cy="400" r="6" fill="#e8752a"/><text x="95" y="408">호텔 제외 · 진짜 맛집 30곳 (미쉐린·노포·체인 대표점)</text>
+      <circle cx="75" cy="445" r="6" fill="#e8752a"/><text x="95" y="453">지도 + 체크리스트 + 룰렛 + 추천 코스 + 전화·예약</text>
+      <circle cx="75" cy="490" r="6" fill="#e8752a"/><text x="95" y="498">📱 PWA 앱 설치 · 오프라인 지원 · 방문 기록</text>
+    </g>
+    <rect x="60" y="530" width="1080" height="60" fill="#5a3a1a" rx="30"/>
+    <text x="600" y="570" text-anchor="middle" font-size="26" font-weight="900" fill="#fff6e0">서울 도심 맛집 투어 · 30곳 · 홈화면 앱 설치 가능</text>
+  </svg>
+</div>
+
+<div class="hint">
+  <strong>사용법</strong><br>
+  1. 위 <strong>"⬇ og-image.png 다운로드"</strong> 버튼 클릭<br>
+  2. 다운로드 폴더에서 <code>og-image.png</code>를 이 프로젝트 폴더로 이동<br>
+  3. Netlify에 폴더 전체 다시 드래그
+</div>
+
+<script>
+function convert() {
+  const svg = document.getElementById('ogsvg');
+  // 속성에 원본 크기 보장
+  const svgClone = svg.cloneNode(true);
+  svgClone.setAttribute('width', 1200);
+  svgClone.setAttribute('height', 630);
+  const xml = new XMLSerializer().serializeToString(svgClone);
+  const svg64 = btoa(unescape(encodeURIComponent(xml)));
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff6e0';
+    ctx.fillRect(0, 0, 1200, 630);
+    ctx.drawImage(img, 0, 0, 1200, 630);
+    canvas.toBlob((blob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'og-image.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }, 'image/png');
+  };
+  img.onerror = (e) => alert('변환 실패. 브라우저 콘솔 확인하세요.');
+  img.src = 'data:image/svg+xml;base64,' + svg64;
+}
+</script>
+</body>
+</html>
