@@ -63,11 +63,13 @@
 
   /* Tablet */
   @media (max-width: 960px) {
-    .app { flex-direction: column; padding: 8px; gap: 8px; }
+    .app { flex-direction: column; padding: 0; gap: 4px; }
+    .list-panel { padding: 0 6px; }
     .map-panel {
-      position: sticky; top: 72px; z-index: 10;
-      overflow: hidden; border-radius: 10px;
+      position: static;
+      overflow: hidden; border-radius: 0;
       background: var(--paper);
+      margin: 0;
     }
     .map-panel.collapsed { max-height: 42px; }
     .map-panel svg { display: block; width: 100%; height: auto; }
@@ -415,7 +417,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.1</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.2</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -787,11 +789,11 @@ let filter = 'all';
 let activeCourse = null;
 
 const COURSES = [
-  { id:'lunch', icon:'🌅', title:'광화문 직장인 런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
-  { id:'hanok', icon:'🏛️', title:'북촌·서촌 한옥 투어', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
-  { id:'night', icon:'🌙', title:'명동 야식 투어', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
-  { id:'michelin', icon:'🥇', title:'미쉐린 코스', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
-  { id:'nopo', icon:'🕰️', title:'50년+ 노포 투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
+  { id:'lunch', icon:'🌅', title:'광화문런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
+  { id:'hanok', icon:'🏛️', title:'북촌한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
+  { id:'night', icon:'🌙', title:'명동야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
+  { id:'michelin', icon:'🥇', title:'미쉐린', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
+  { id:'nopo', icon:'🕰️', title:'노포투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
 ];
 
 const pinsG = document.getElementById('pins');
