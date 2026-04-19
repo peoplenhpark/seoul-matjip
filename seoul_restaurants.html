@@ -31,6 +31,12 @@
 <meta name="apple-mobile-web-app-title" content="서울 맛집">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
+
+<!-- Leaflet (오픈 지도) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
 <style>
   :root {
     --c-w: #e8a848; --c-k: #c05a3a; --c-j: #e07a92;
@@ -109,12 +115,47 @@
     .reset-btn { padding: 5px 12px; font-size: 12px; }
   }
 
-  /* Pin touch-target via visual hit area */
-  .pin-group { cursor: pointer; transition: transform 0.15s; }
-  .pin-group:hover circle.pin-fill { stroke-width: 3; }
-  .pin-group.visited .pin-fill { opacity: 0.3; }
-  .pin-group.highlight circle.pin-fill { stroke: #ffd700 !important; stroke-width: 4; }
-  .pin-group .pin-hit { fill: transparent; }
+  /* Leaflet 지도 핀 */
+  #leafletMap { z-index: 1; }
+  .leaflet-container { background: #fef6e0 !important; font-family: inherit; }
+  .r-pin-icon { background: transparent !important; border: none !important; }
+  .r-pin {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14px; color: #fff;
+    border: 2.5px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .r-pin:hover { transform: scale(1.15); }
+  .r-pin.visited { opacity: 0.45; filter: grayscale(0.4); }
+  .r-pin.highlight { outline: 3px solid #ffd700; outline-offset: 2px; animation: pulse 0.8s ease 3; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+  .r-pin-w { background: var(--c-w); color: #3a2a10; }
+  .r-pin-k { background: var(--c-k); }
+  .r-pin-j { background: var(--c-j); }
+  .r-pin-c { background: var(--c-c); }
+  .r-pin-s { background: var(--c-s); }
+  .r-pin-e { background: var(--c-e); }
+
+  /* 랜드마크 · 4대문 라벨 */
+  .lmk-icon, .lmk-gate-icon { background: transparent !important; border: none !important; }
+  .lmk {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: rgba(255,246,224,0.92); border: 1.5px solid #8a6040;
+    border-radius: 12px; padding: 2px 7px 2px 5px; white-space: nowrap;
+    font-size: 11px; font-weight: 900; color: #5a3a1a;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15); transform: translate(-50%, -50%);
+  }
+  .lmk span { font-size: 10.5px; }
+  .lmk-gate {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #e8752a; color: #fff; border: 2px solid #fff;
+    border-radius: 12px; padding: 3px 8px 3px 6px; white-space: nowrap;
+    font-size: 11px; font-weight: 900;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3); transform: translate(-50%, -50%);
+  }
+  .lmk-gate.dashed { background: rgba(232,117,42,0.55); }
+  .lmk-gate span { font-size: 10.5px; }
 
   /* 지도 툴바 (지도 위에 위치) */
   .map-toolbar {
@@ -141,9 +182,8 @@
     padding: 16px; top: 0 !important;
     display: flex; gap: 12px; border-radius: 0;
   }
-  .map-panel.fullscreen svg {
-    flex: 1; width: auto; height: 100% !important;
-    max-height: calc(100vh - 32px) !important; object-fit: contain;
+  .map-panel.fullscreen #leafletMap {
+    flex: 1; width: auto !important; height: calc(100vh - 32px) !important;
     background: #fef6e0; border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.4);
   }
@@ -187,7 +227,7 @@
 
   @media (max-width: 640px) {
     .map-panel.fullscreen { padding: 8px; flex-direction: column; gap: 8px; }
-    .map-panel.fullscreen svg { max-height: 55vh !important; }
+    .map-panel.fullscreen #leafletMap { height: 55vh !important; flex: none; }
     .map-panel.fullscreen .map-sidebar { width: auto; flex: 1; min-height: 30vh; }
   }
 
@@ -420,7 +460,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.6</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.0</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -441,145 +481,7 @@
 </div>
 <div class="map-panel" id="mapPanel">
 <div class="map-sidebar" id="mapSidebar"></div>
-<svg viewBox="30 120 1300 760" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-  <!-- viewBox 여백 + 상단 산줄기 그래픽 -->
-  <rect x="30" y="120" width="1300" height="760" fill="#fef6e0"/>
-
-  <!-- 상단 산줄기 (장식) -->
-  <path d="M50,220 Q200,140 320,200 Q450,125 570,195 Q700,130 830,200 Q960,135 1080,195 Q1210,140 1310,215 L1310,240 L50,240 Z" fill="#c8dbb4" opacity="0.8"/>
-  <path d="M50,220 Q200,140 320,200 Q450,125 570,195 Q700,130 830,200 Q960,135 1080,195 Q1210,140 1310,215" fill="none" stroke="#7a9a68" stroke-width="2" opacity="0.7"/>
-  <g fill="#4a6a3a" font-size="14" font-weight="900">
-    <text x="255" y="175">△ 인왕산</text>
-    <text x="505" y="170">△ 북악산</text>
-    <text x="1015" y="175">△ 낙산</text>
-  </g>
-
-  <!-- 한양도성 경계 -->
-  <path d="M130,260 Q80,540 230,800 Q700,860 1170,790 Q1280,540 1230,260" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
-
-  <!-- 3대 궁·종묘 (얕은 블록) -->
-  <g fill="#f3e4c5" stroke="#b88e58" stroke-width="2">
-    <rect x="440" y="275" width="190" height="110" rx="8"/>
-    <rect x="735" y="285" width="128" height="88" rx="8"/>
-    <rect x="905" y="310" width="98" height="72" rx="8"/>
-  </g>
-  <g fill="#8a5a28" font-size="16" font-weight="900">
-    <text x="480" y="340">경복궁</text>
-    <text x="760" y="335">창덕궁</text>
-    <text x="925" y="352">종묘</text>
-  </g>
-
-  <!-- 4대문 점 -->
-  <g>
-    <circle cx="560" cy="242" r="10" fill="#e8752a"/>
-    <text x="576" y="247" font-size="13" font-weight="900" fill="#5a3a1a">숙정문(북)</text>
-
-    <circle cx="124" cy="490" r="10" fill="none" stroke="#e8752a" stroke-width="3" stroke-dasharray="3 2"/>
-    <text x="50" y="475" font-size="13" font-weight="900" fill="#5a3a1a">돈의문터(서)</text>
-
-    <circle cx="1280" cy="490" r="10" fill="#e8752a"/>
-    <text x="1195" y="475" font-size="13" font-weight="900" fill="#5a3a1a">흥인지문(동)</text>
-
-    <circle cx="560" cy="852" r="10" fill="#e8752a"/>
-    <text x="578" y="858" font-size="13" font-weight="900" fill="#5a3a1a">숭례문(남)</text>
-  </g>
-
-  <!-- 세종대로 (남북) -->
-  <line x1="555" y1="260" x2="555" y2="780" stroke="#c0a068" stroke-width="8"/>
-  <text x="570" y="275" font-size="13" font-weight="900" fill="#5a3a1a">세종대로</text>
-
-  <!-- 종로 (y=510) -->
-  <line x1="110" y1="510" x2="1280" y2="510" stroke="#e8a848" stroke-width="14"/>
-  <text x="60" y="515" font-size="22" font-weight="900" fill="#8a5a18">종로</text>
-  <g font-size="14" font-weight="900" fill="#fff">
-    <circle cx="258"  cy="510" r="13" fill="#8a5a18"/><text x="253" y="515">1</text>
-    <circle cx="435"  cy="510" r="13" fill="#8a5a18"/><text x="430" y="515">2</text>
-    <circle cx="612"  cy="510" r="13" fill="#8a5a18"/><text x="607" y="515">3</text>
-    <circle cx="789"  cy="510" r="13" fill="#8a5a18"/><text x="784" y="515">4</text>
-    <circle cx="966"  cy="510" r="13" fill="#8a5a18"/><text x="961" y="515">5</text>
-    <circle cx="1143" cy="510" r="13" fill="#8a5a18"/><text x="1138" y="515">6</text>
-  </g>
-
-  <!-- 청계천 -->
-  <path d="M110,590 L1280,590" stroke="#6fb4d6" stroke-width="5" fill="none" stroke-linecap="round"/>
-  <text x="60" y="594" font-size="13" font-weight="900" fill="#3a7aa0">청계천</text>
-
-  <!-- 을지로 -->
-  <line x1="110" y1="675" x2="1280" y2="675" stroke="#4a7ba0" stroke-width="14"/>
-  <text x="60" y="680" font-size="20" font-weight="900" fill="#1e3450">을지로</text>
-  <g font-size="13" font-weight="900" fill="#fff">
-    <circle cx="246"  cy="675" r="12" fill="#1e3450"/><text x="242" y="680">1</text>
-    <circle cx="397"  cy="675" r="12" fill="#1e3450"/><text x="393" y="680">2</text>
-    <circle cx="548"  cy="675" r="12" fill="#1e3450"/><text x="544" y="680">3</text>
-    <circle cx="700"  cy="675" r="12" fill="#1e3450"/><text x="696" y="680">4</text>
-    <circle cx="852"  cy="675" r="12" fill="#1e3450"/><text x="848" y="680">5</text>
-    <circle cx="1004" cy="675" r="12" fill="#1e3450"/><text x="1000" y="680">6</text>
-    <circle cx="1156" cy="675" r="12" fill="#1e3450"/><text x="1152" y="680">7</text>
-  </g>
-
-  <!-- 퇴계로 / 남대문로 -->
-  <line x1="110" y1="760" x2="1280" y2="760" stroke="#c0a068" stroke-width="6"/>
-  <text x="60" y="764" font-size="13" font-weight="900" fill="#5a3a1a">퇴계로</text>
-  <line x1="555" y1="780" x2="555" y2="850" stroke="#c0a068" stroke-width="6"/>
-
-  <!-- 명동 핀 -->
-  <circle cx="570" cy="735" r="14" fill="#e07a92" stroke="#6a4020" stroke-width="2"/>
-  <text x="557" y="739" font-size="11" font-weight="900" fill="#fff">명동</text>
-
-  <!-- 나침반 -->
-  <g transform="translate(95,250)">
-    <circle r="18" fill="#fff6e0" stroke="#6a4020" stroke-width="2"/>
-    <polygon points="0,-14 4,0 0,14 -4,0" fill="#d87050"/>
-    <text x="-4" y="-22" font-size="11" font-weight="900" fill="#5a2a1a">N</text>
-  </g>
-
-  <!-- ===== 주요 랜드마크 10곳 ===== -->
-  <g class="landmarks" opacity="0.9">
-    <g transform="translate(510,408)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">광화문</text>
-    </g>
-    <g transform="translate(240,355)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">경희궁</text>
-    </g>
-    <g transform="translate(840,380)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">북촌한옥마을</text>
-    </g>
-    <g transform="translate(695,475)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">인사동</text>
-    </g>
-    <g transform="translate(450,482)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">보신각</text>
-    </g>
-    <g transform="translate(990,488)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">광장시장</text>
-    </g>
-    <g transform="translate(320,630)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="-50" y="4" font-size="11" font-weight="900" fill="#5a3a1a">덕수궁</text>
-    </g>
-    <g transform="translate(365,655)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">서울시청</text>
-    </g>
-    <g transform="translate(670,745)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="10" y="4" font-size="11" font-weight="900" fill="#5a3a1a">명동성당</text>
-    </g>
-    <g transform="translate(1205,555)">
-      <circle r="6" fill="#6a4020" stroke="#fff" stroke-width="2"/>
-      <text x="-38" y="-8" font-size="11" font-weight="900" fill="#5a3a1a">DDP</text>
-    </g>
-  </g>
-
-  <!-- ===== 식당 핀 (JS로 생성) ===== -->
-  <g id="pins"></g>
-</svg>
+<div id="leafletMap" style="width:100%; height:50vh; min-height:360px; background:#fef6e0;"></div>
 </div>
 
 <!-- ============ 리스트 패널 ============ -->
@@ -678,162 +580,162 @@ const COLORS = { w:'#e8a848', k:'#c05a3a', j:'#e07a92', c:'#d04040', s:'#70a860'
 
 const R = [
   // 양식 w1-w5 (아메리칸·스테이크·버거)
-  { id:'w1', n:'울프강 스테이크하우스 광화문점', v:'태평로1가 빌딩 2F', a:'중구 세종대로21길 40', x:485, y:555,
+  { id:'w1', n:'울프강 스테이크하우스 광화문점', v:'태평로1가 빌딩 2F', a:'중구 세종대로21길 40', lat:37.5696, lng:126.9775,
     b:'뉴욕 3대 스테이크, 2025 광화문 진출', phone:'02-722-9004',
     desc:'뉴욕에서 시작된 프리미엄 스테이크하우스. 드라이에이징 포터하우스와 크랩케이크 명성. 세계 41번째 매장이 광화문에 오픈.',
     hours:'런치 11:30-15:00 / 디너 17:30-22:00', price:'1인 12~25만원',
     menu:'포터하우스 스테이크, 크랩케이크, 시저샐러드', tip:'캐치테이블 예약. 2인 포터하우스 추천.' },
-  { id:'w2', n:'마치 (MAACHI) 스테이크하우스', v:'광화문 그랑서울 지하', a:'종로구 종로 33 그랑서울', x:485, y:440,
+  { id:'w2', n:'마치 (MAACHI) 스테이크하우스', v:'광화문 그랑서울 지하', a:'종로구 종로 33 그랑서울', lat:37.5707, lng:126.9832,
     b:'한우 스테이크 코스 파인다이닝',
     desc:'미쉐린 Joux·July 출신 이종욱 셰프의 한우 스테이크 전문점. 코스형 프리미엄 다이닝.',
     hours:'런치 12:00-15:00 / 디너 18:00-22:00', price:'코스 12~28만원',
     menu:'한우 드라이에이징, 시즌 코스', tip:'캐치테이블 예약 필수.' },
-  { id:'w3', n:'쉑쉑버거 광화문 D타워', v:'D타워 1F', a:'종로구 종로3길 17', x:320, y:475,
+  { id:'w3', n:'쉑쉑버거 광화문 D타워', v:'D타워 1F', a:'종로구 종로3길 17', lat:37.5712, lng:126.978,
     b:'뉴욕 프리미엄 버거',
     desc:'뉴욕 쉑쉑의 광화문 지점. D타워 1층, 쉑버거와 쉑쉑 크림치즈가 시그니처.',
     hours:'매일 11:00-22:00', price:'버거 세트 1~1.6만원',
     menu:'쉑버거, 스모크쉑, 쉐이크', tip:'점심시간 대기 있음. 앱 주문 가능.' },
-  { id:'w4', n:'파이브가이즈 광화문점', v:'D타워 주변', a:'광화문 D타워 / 센터포인트', x:335, y:465,
+  { id:'w4', n:'파이브가이즈 광화문점', v:'D타워 주변', a:'광화문 D타워 / 센터포인트', lat:37.5712, lng:126.9782,
     b:'미국 프리미엄 수제버거',
     desc:'미국 동부 출신 수제버거 체인. 주문 시 바로 만드는 패티와 무제한 땅콩.',
     hours:'매일 11:00-22:00', price:'버거 세트 1.5~2.2만원',
     menu:'베이컨 치즈버거, 케이준 프라이', tip:'토핑 무제한 무료. 양 많음.' },
-  { id:'w5', n:'바스버거 광화문점', v:'광화문 빌딩 1F', a:'종로구 광화문 인근', x:355, y:488,
+  { id:'w5', n:'바스버거 광화문점', v:'광화문 빌딩 1F', a:'종로구 광화문 인근', lat:37.571, lng:126.9785,
     b:'한국 수제버거 대표 브랜드',
     desc:'국산 한우 패티를 쓰는 국내 프리미엄 수제버거. 광화문 오피스 직장인 인기.',
     hours:'매일 11:00-21:30', price:'버거 세트 1.2~1.8만원',
     menu:'한우 버거, 클래식 치즈버거', tip:'광화문 런치타임 인기, 웨이팅 가능.' },
 
   // 한식 k1-k5 (노포·미쉐린)
-  { id:'k1', n:'광화문 미진', v:'르메이에르종로타운 1F', a:'종로구 종로 19', x:255, y:498,
+  { id:'k1', n:'광화문 미진', v:'르메이에르종로타운 1F', a:'종로구 종로 19', lat:37.57, lng:126.9835,
     b:'평양냉면·메밀 노포 (1954~)', phone:'02-730-6198',
     desc:'1954년 개업한 서울의 대표 메밀냉면 노포. 깔끔한 육수와 쫄깃한 메밀면. 미쉐린 가이드 다년 등재.',
     hours:'매일 10:30-21:00 (L.O. 20:30)', price:'냉메밀 1.3만원~',
     menu:'냉메밀(평양냉면), 편육, 녹두전', tip:'런치 시간 대기 긺. 오픈런 추천.' },
-  { id:'k2', n:'우래옥', v:'창경궁로 62-29', a:'중구 주교동', x:740, y:595,
+  { id:'k2', n:'우래옥', v:'창경궁로 62-29', a:'중구 주교동', lat:37.569, lng:126.9915,
     b:'평양냉면 원조 (1946~), 미쉐린 빕구르망',
     desc:'1946년 창업한 서울 최고(最古) 평양냉면집. 소고기 육수의 진한 풍미. 2022~2025 4년 연속 미쉐린 빕구르망.',
     hours:'화~일 11:30-21:00 (월 휴무)', price:'평양냉면 1.6만원',
     menu:'평양냉면, 불고기, 김치말이밥', tip:'냉면에 밥 말아먹기 유명. 주말 대기 김.' },
-  { id:'k3', n:'명동교자 본점', v:'명동10길 29', a:'중구 명동', x:595, y:708,
+  { id:'k3', n:'명동교자 본점', v:'명동10길 29', a:'중구 명동', lat:37.5636, lng:126.9854,
     b:'칼국수·만두 노포 (1966~)',
     desc:'1966년 명동에서 시작된 칼국수·만두 전문 노포. 닭 육수 손칼국수와 고기만두가 시그니처.',
     hours:'매일 10:30-21:30', price:'칼국수·만두 9~11천원',
     menu:'칼국수, 콩국수, 고기만두', tip:'관광객·직장인 모두 찾는 서울 필수 노포.' },
-  { id:'k4', n:'용수산 비원점', v:'창덕궁1길 2', a:'종로구 와룡동 (창덕궁 옆)', x:800, y:440,
+  { id:'k4', n:'용수산 비원점', v:'창덕궁1길 2', a:'종로구 와룡동 (창덕궁 옆)', lat:37.577, lng:126.9905,
     b:'개성 한정식·미쉐린 선정',
     desc:'개성식 한정식 전문. 창덕궁·창경궁 바로 옆 고즈넉한 한옥 분위기. 미쉐린 가이드 등재.',
     hours:'11:30-22:00 (B/T 15:00-17:30, 월 휴무)', price:'한정식 4~10만원',
     menu:'개성만두, 궁중 한정식 코스', tip:'창덕궁 관람 후 코스 적합.' },
-  { id:'k5', n:'온지움 (Onjium)', v:'한옥 단독', a:'종로구 효자로 (서촌)', x:418, y:385,
+  { id:'k5', n:'온지움 (Onjium)', v:'한옥 단독', a:'종로구 효자로 (서촌)', lat:37.579, lng:126.971,
     b:'미쉐린 ★ · 궁중·반가 한정식',
     desc:'궁중음식·반가음식을 현대적으로 재해석. 전통 한옥 공간. 미쉐린 1스타 다년 유지.',
     hours:'런치·디너 2회전 (예약제)', price:'1인 18~30만원',
     menu:'맷돌두부, 궁중신선로, 계절 반찬', tip:'1~2개월 전 예약 오픈, 조기 마감.' },
 
   // 일식 j1-j5 (스시 오마카세·라멘)
-  { id:'j1', n:'스시 소라 광화문점', v:'르메이에르종로타운 B1', a:'종로구 종로 19', x:245, y:518,
+  { id:'j1', n:'스시 소라 광화문점', v:'르메이에르종로타운 B1', a:'종로구 종로 19', lat:37.57, lng:126.9834,
     b:'광화문 스시 오마카세 대표', phone:'02-733-8400',
     desc:'광화문·종각 오마카세 1대장으로 불리는 미들급 대표점. 코우지 시리즈 스시 전문.',
     hours:'월~금 11:30-21:50 / 토·일 11:30-21:20', price:'런치 6만원 / 디너 11만원',
     menu:'오마카세 스시·사시미 코스', tip:'캐치테이블 예약. 2시간 주차 지원.' },
-  { id:'j2', n:'스시 키마에', v:'두산위브파빌리온 1F', a:'종로구 (종각~광화문 사이)', x:310, y:475,
+  { id:'j2', n:'스시 키마에', v:'두산위브파빌리온 1F', a:'종로구 (종각~광화문 사이)', lat:37.57, lng:126.981,
     b:'오마카세 코스 전문',
     desc:'차완무시·스시·온소면·모나카까지 이어지는 오마카세 코스. 점심·저녁 모두 코스제 운영.',
     hours:'런치·디너 2회전', price:'런치 7~9만원 / 디너 13~18만원',
     menu:'오마카세 코스 (트러플 차완무시 등)', tip:'종각역 2번 도보 5분, 광화문역 2번 10분.' },
-  { id:'j3', n:'스시 미치루', v:'이마빌딩 B1', a:'종로구 종로1길 42', x:340, y:455,
+  { id:'j3', n:'스시 미치루', v:'이마빌딩 B1', a:'종로구 종로1길 42', lat:37.5735, lng:126.9835,
     b:'광화문~안국 오마카세',
     desc:'광화문-안국 중간 지하 1층 오마카세 스시. 정갈한 구성과 합리적 가격대.',
     hours:'월~토 12:00-21:30 (일 휴무)', price:'런치 8만원 / 디너 15~22만원',
     menu:'제철 오마카세 스시·사시미', tip:'캐치테이블 예약 권장.' },
-  { id:'j4', n:'스시 와 (Sushi Wa)', v:'광화문 빌딩', a:'종로구 광화문', x:370, y:460,
+  { id:'j4', n:'스시 와 (Sushi Wa)', v:'광화문 빌딩', a:'종로구 광화문', lat:37.5715, lng:126.979,
     b:'광화문 오마카세 미들급',
     desc:'광화문 지역 오마카세 스시 인기 매장. 런치 코스 가성비로 알려짐.',
     hours:'런치·디너 (예약제)', price:'런치 6~8만원 / 디너 11~16만원',
     menu:'오마카세 스시 10~15피스', tip:'캐치테이블/전화 예약.' },
-  { id:'j5', n:'이치란 라멘 명동점', v:'명동 상가', a:'중구 명동', x:625, y:720,
+  { id:'j5', n:'이치란 라멘 명동점', v:'명동 상가', a:'중구 명동', lat:37.5636, lng:126.9858,
     b:'일본 정통 돈코츠 라멘',
     desc:'일본 후쿠오카 본점의 글로벌 체인 라멘. 개인 부스에서 집중해 먹는 독특한 콘셉트.',
     hours:'매일 10:30-23:00', price:'라멘 1.5~1.9만원',
     menu:'천연 돈코츠 라멘, 챠슈', tip:'매운맛·면 굵기·토핑 개인 주문지 작성.' },
 
   // 중식 c1-c5
-  { id:'c1', n:'딘타이펑 명동중앙점', v:'명동 중앙 빌딩', a:'중구 명동', x:550, y:725,
+  { id:'c1', n:'딘타이펑 명동중앙점', v:'명동 중앙 빌딩', a:'중구 명동', lat:37.5635, lng:126.9833,
     b:'대만 샤오롱바오 세계 10대 레스토랑',
     desc:'대만 정통 샤오롱바오와 딤섬 전문. NYT 선정 세계 10대 레스토랑 중 하나. 명동중앙점은 대표 지점.',
     hours:'매일 11:00-22:00', price:'1인 3~6만원',
     menu:'샤오롱바오, 새우볶음밥, 딤섬 세트', tip:'피크시간 웨이팅. 대만식 정통.' },
-  { id:'c2', n:'크리스탈제이드 광화문 상하이팰리스점', v:'서머셋팰리스 1F', a:'종로구 율곡로2길 7', x:660, y:355,
+  { id:'c2', n:'크리스탈제이드 광화문 상하이팰리스점', v:'서머셋팰리스 1F', a:'종로구 율곡로2길 7', lat:37.5737, lng:126.982,
     b:'광둥식·딤섬 프리미엄 체인', phone:'02-720-0133',
     desc:'싱가포르 크리스탈제이드 그룹의 광화문 지점. 광둥식과 상하이식 딤섬이 시그니처.',
     hours:'런치 11:30-15:30 / 디너 17:30-22:00', price:'1인 5~12만원',
     menu:'딤섬 세트, 베이징덕, 샤오롱바오', tip:'캐치테이블 예약. 비즈니스 런치 적합.' },
-  { id:'c3', n:'신승관', v:'종로1가 24 빌딩 2F', a:'종로구 종로1가', x:275, y:468,
+  { id:'c3', n:'신승관', v:'종로1가 24 빌딩 2F', a:'종로구 종로1가', lat:37.57, lng:126.983,
     b:'중식 노포 (1964~, 3대째)',
     desc:'1964년 개업한 60년 전통의 중식 노포. 3대째 가업 운영. 광화문 직장인 터줏대감.',
     hours:'매일 11:00-23:00 (B/T 15:00-16:30, 일 휴무)', price:'1인 2~5만원',
     menu:'짜장면, 짬뽕, 탕수육, 류산슬', tip:'노포 감성. 점심 대기 있음.' },
-  { id:'c4', n:'진아춘 광화문점', v:'광화문 오피시아 B1', a:'종로구 새문안로 92', x:385, y:475,
+  { id:'c4', n:'진아춘 광화문점', v:'광화문 오피시아 B1', a:'종로구 새문안로 92', lat:37.5713, lng:126.9765,
     b:'광화문 직장인 중식 맛집', phone:'02-720-0688',
     desc:'광화문 오피시아 지하의 정통 중식당. 점심 세트와 짬뽕·깐풍기가 인기.',
     hours:'월~금 11:00-21:20 / 토 11:00-20:00 (B/T 14:30-17:00, 일 휴무)', price:'1인 1.5~4만원',
     menu:'짬뽕, 깐풍기, 짜장면, 양장피', tip:'광화문 런치 피크 대기.' },
-  { id:'c5', n:'라오베이징 종로점', v:'종로 빌딩', a:'종로구 종로', x:480, y:495,
+  { id:'c5', n:'라오베이징 종로점', v:'종로 빌딩', a:'종로구 종로', lat:37.5702, lng:126.988,
     b:'정통 북경식 중화요리',
     desc:'베이징 출신 셰프의 정통 북경식 중화. 베이징덕과 완탕이 시그니처.',
     hours:'매일 11:00-22:00', price:'1인 3~8만원',
     menu:'베이징덕, 완탕, 마파두부', tip:'베이징덕은 2~3인 사전 주문.' },
 
   // 동남아 s1-s5 (베트남·태국·아시아 퓨전)
-  { id:'s1', n:'띤띤 광화문 (Tin Tin)', v:'SFC몰 B2', a:'중구 세종대로 136', x:490, y:580,
+  { id:'s1', n:'띤띤 광화문 (Tin Tin)', v:'SFC몰 B2', a:'중구 세종대로 136', lat:37.569, lng:126.9775,
     b:'베트남 현지풍 · 루이비통 가이드 등재',
     desc:'베트남 현지 식당 분위기의 쌀국수·분짜 전문점. 루이비통 시티가이드 서울 2019 등재.',
     hours:'매일 11:30-21:30 (B/T 15:00-17:00)', price:'1인 1.5~2.5만원',
     menu:'분짜, 매운해산물 쌀국수, 월남쌈', tip:'SFC 지하 B2. 직장인 런치 인기.' },
-  { id:'s2', n:'에머이 종각점', v:'종각 빌딩', a:'종로구 종로 (종각역)', x:425, y:503,
+  { id:'s2', n:'에머이 종각점', v:'종각 빌딩', a:'종로구 종로 (종각역)', lat:37.57, lng:126.9825,
     b:'하노이식 베트남 쌀국수',
     desc:'하노이 스타일 베트남 체인 대표점. 종각점은 런치 직장인 수요 많음.',
     hours:'매일 11:00-22:00', price:'1인 1.2~2.2만원',
     menu:'분짜, 쌀국수 퍼보, 바인미', tip:'광화문·시청 동선과 연결.' },
-  { id:'s3', n:'미분당 시청점', v:'시청 빌딩 1F', a:'중구 시청', x:400, y:635,
+  { id:'s3', n:'미분당 시청점', v:'시청 빌딩 1F', a:'중구 시청', lat:37.566, lng:126.9782,
     b:'베트남 쌀국수 프랜차이즈',
     desc:'국내 30여개 매장을 운영하는 베트남 쌀국수 브랜드. 한국인 입맛에 맞춘 깔끔한 육수.',
     hours:'매일 11:00-22:00', price:'쌀국수 9~1.3만원',
     menu:'양지 쌀국수, 차돌 쌀국수, 짜조', tip:'가벼운 점심·저녁. 혼밥 가능.' },
-  { id:'s4', n:'남박', v:'서촌 한옥 인근', a:'종로구 서촌 (누하동 인근)', x:440, y:410,
+  { id:'s4', n:'남박', v:'서촌 한옥 인근', a:'종로구 서촌 (누하동 인근)', lat:37.576, lng:126.9745,
     b:'남준영 셰프 정통 베트남',
     desc:'베트남 현지 셰프 남준영 대표의 정통 북부 베트남 요리. 분짜하노이와 쌀국수가 대표작.',
     hours:'매일 11:00-21:30 (B/T)', price:'1인 1.5~3만원',
     menu:'분짜 하노이, 쌀국수, 월남쌈', tip:'서촌 산책과 함께. 주말 대기 있음.' },
-  { id:'s5', n:'에머이 광화문점', v:'광화문 오피스', a:'종로구 광화문', x:400, y:520,
+  { id:'s5', n:'에머이 광화문점', v:'광화문 오피스', a:'종로구 광화문', lat:37.5715, lng:126.9785,
     b:'하노이식 베트남 (지점)',
     desc:'에머이 체인의 광화문 지점. 직장인 점심 수요 중심, 합리적 가격대.',
     hours:'매일 11:00-22:00', price:'1인 1.2~2.2만원',
     menu:'쌀국수, 분짜, 바인미', tip:'광화문 오피스 런치 단골.' },
 
   // 유럽식 e1-e5 (이탈리안·프렌치)
-  { id:'e1', n:'라칸티나 (La Cantina)', v:'삼성빌딩 B1', a:'중구 을지로 19 (을지로1가)', x:470, y:650,
+  { id:'e1', n:'라칸티나 (La Cantina)', v:'삼성빌딩 B1', a:'중구 을지로 19 (을지로1가)', lat:37.566, lng:126.9815,
     b:'국내 최초 이탈리안 (1967~), 서울미래유산', phone:'02-777-2579',
     desc:'1967년 이병철 회장 권유로 개업한 국내 최초의 이탈리안 레스토랑. 서울미래유산 지정. 롯데호텔 건너편.',
     hours:'주중 11:30-23:00 (B/T 있음)', price:'1인 4~10만원',
     menu:'클래식 파스타, 스테이크, 이탈리아 와인', tip:'올드스쿨 정통 감성. 기념일 적합.' },
-  { id:'e2', n:'까사디쉐프 광화문', v:'광화문 빌딩', a:'종로구 광화문', x:355, y:505,
+  { id:'e2', n:'까사디쉐프 광화문', v:'광화문 빌딩', a:'종로구 광화문', lat:37.5712, lng:126.977,
     b:'이탈리안 (평점 4.3)',
     desc:'광화문 지역 이탈리안 맛집. 홈메이드 파스타와 피자, 와인 페어링.',
     hours:'런치·디너', price:'1인 3~6만원',
     menu:'트러플 파스타, 화덕 피자, 스테이크', tip:'광화문 저녁 데이트 코스.' },
-  { id:'e3', n:'뽐모도로 광화문점', v:'광화문 빌딩', a:'종로구 광화문', x:400, y:540,
+  { id:'e3', n:'뽐모도로 광화문점', v:'광화문 빌딩', a:'종로구 광화문', lat:37.5705, lng:126.9775,
     b:'크림 스파게티 유명 이탈리안',
     desc:'광화문 직장인 이탈리안. 진한 크림 스파게티로 유명.',
     hours:'매일 11:00-22:00', price:'1인 2~4만원',
     menu:'크림 스파게티, 봉골레, 피자', tip:'점심 프리픽스 가성비.' },
-  { id:'e4', n:'디미 (dimi)', v:'서촌 한옥 골목', a:'종로구 서촌 (경복궁 서측)', x:395, y:415,
+  { id:'e4', n:'디미 (dimi)', v:'서촌 한옥 골목', a:'종로구 서촌 (경복궁 서측)', lat:37.5775, lng:126.973,
     b:'생면 파스타 전문 이탈리안',
     desc:'서촌의 생면 파스타 전문점. 매일 반죽한 홈메이드 파스타가 일품.',
     hours:'런치·디너 (B/T 있음)', price:'1인 2.5~5만원',
     menu:'생면 까르보나라, 라구 파파르델레', tip:'서촌 산책과 함께. 예약 권장.' },
-  { id:'e5', n:'비스트로 서울 광화문점', v:'광화문 빌딩', a:'종로구 광화문', x:365, y:530,
+  { id:'e5', n:'비스트로 서울 광화문점', v:'광화문 빌딩', a:'종로구 광화문', lat:37.571, lng:126.9778,
     b:'프렌치 비스트로',
     desc:'광화문 지역의 캐주얼 프렌치 비스트로. 스테이크 프리트와 에스카르고가 인기.',
     hours:'매일 11:00-22:00', price:'1인 3~6만원',
@@ -854,9 +756,29 @@ const COURSES = [
   { id:'nopo', icon:'🕰️', title:'노포투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
 ];
 
-const pinsG = document.getElementById('pins');
+/* 주요 랜드마크 10곳 + 4대문 (공식 GPS) */
+const LANDMARKS = [
+  { n:'경복궁', lat:37.5796, lng:126.9770, icon:'🏯' },
+  { n:'창덕궁', lat:37.5794, lng:126.9910, icon:'🏯' },
+  { n:'종묘', lat:37.5748, lng:126.9940, icon:'⛩️' },
+  { n:'덕수궁', lat:37.5659, lng:126.9751, icon:'🏯' },
+  { n:'서울시청', lat:37.5665, lng:126.9780, icon:'🏛️' },
+  { n:'보신각', lat:37.5703, lng:126.9838, icon:'🔔' },
+  { n:'광장시장', lat:37.5705, lng:127.0025, icon:'🏪' },
+  { n:'DDP', lat:37.5675, lng:127.0094, icon:'🏟️' },
+  { n:'명동성당', lat:37.5635, lng:126.9872, icon:'⛪' },
+  { n:'북촌한옥마을', lat:37.5823, lng:126.9833, icon:'🏘️' }
+];
+const GATES = [
+  { n:'숭례문(남)', lat:37.5600, lng:126.9754 },
+  { n:'흥인지문(동)', lat:37.5710, lng:127.0097 },
+  { n:'숙정문(북)', lat:37.5922, lng:126.9825 },
+  { n:'돈의문터(서)', lat:37.5680, lng:126.9680, dashed:true }
+];
+
 const listEl = document.getElementById('list');
-const SVG_NS = 'http://www.w3.org/2000/svg';
+let leafletMap = null;
+let markerById = {};
 
 function getAllR() { return [...R, ...customR]; }
 function getCat(r) { return r.cat || r.id[0]; }
@@ -905,42 +827,67 @@ function buildUrls(r) {
   };
 }
 
+/* ===== Leaflet 지도 초기화 ===== */
+function initMap() {
+  if (leafletMap || typeof L === 'undefined') return;
+  leafletMap = L.map('leafletMap', {
+    center: [37.5700, 126.9820],
+    zoom: 15,
+    zoomControl: true,
+    tap: true
+  });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OSM',
+    maxZoom: 19,
+    minZoom: 13
+  }).addTo(leafletMap);
+
+  // 4대문 마커
+  GATES.forEach(g => {
+    L.marker([g.lat, g.lng], {
+      icon: L.divIcon({
+        className: 'lmk-gate-icon',
+        html: `<div class="lmk-gate${g.dashed?' dashed':''}">⛩<span>${g.n}</span></div>`,
+        iconSize: [0, 0]
+      })
+    }).addTo(leafletMap);
+  });
+
+  // 랜드마크 10곳
+  LANDMARKS.forEach(lm => {
+    L.marker([lm.lat, lm.lng], {
+      icon: L.divIcon({
+        className: 'lmk-icon',
+        html: `<div class="lmk">${lm.icon}<span>${lm.n}</span></div>`,
+        iconSize: [0, 0]
+      })
+    }).addTo(leafletMap);
+  });
+
+  renderPins();
+}
+
 function renderPins() {
-  pinsG.innerHTML = '';
+  if (!leafletMap) return;
+  // 기존 마커 제거
+  Object.values(markerById).forEach(m => leafletMap.removeLayer(m));
+  markerById = {};
+
   getAllR().forEach(r => {
     const c = getCat(r);
-    if (!r.x || !r.y) return;
-    const g = document.createElementNS(SVG_NS, 'g');
-    g.setAttribute('class', 'pin-group' + (visited.includes(r.id) ? ' visited' : ''));
-    g.setAttribute('transform', `translate(${r.x}, ${r.y})`);
-    g.setAttribute('data-id', r.id);
-
-    // 투명 히트박스 (터치 타겟 확대)
-    const hit = document.createElementNS(SVG_NS, 'circle');
-    hit.setAttribute('r', 22);
-    hit.setAttribute('class', 'pin-hit');
-    g.appendChild(hit);
-
-    const circ = document.createElementNS(SVG_NS, 'circle');
-    circ.setAttribute('r', 15);
-    circ.setAttribute('fill', COLORS[c]);
-    circ.setAttribute('stroke', '#2a1a08');
-    circ.setAttribute('stroke-width', 2);
-    circ.setAttribute('class', 'pin-fill');
-    g.appendChild(circ);
-
-    const t = document.createElementNS(SVG_NS, 'text');
-    t.setAttribute('text-anchor', 'middle');
-    t.setAttribute('y', 5);
-    t.setAttribute('fill', c === 'w' ? '#3a2a10' : '#fff');
-    t.setAttribute('font-weight', '900');
-    t.setAttribute('font-size', 14);
-    t.setAttribute('pointer-events', 'none');
-    t.textContent = r.id.slice(1);
-    g.appendChild(t);
-
-    g.addEventListener('click', () => scrollToCard(r.id));
-    pinsG.appendChild(g);
+    if (!r.lat || !r.lng) return;
+    const isV = visited.includes(r.id);
+    const num = r.custom ? '★' : r.id.slice(1);
+    const m = L.marker([r.lat, r.lng], {
+      icon: L.divIcon({
+        className: 'r-pin-icon',
+        html: `<div class="r-pin r-pin-${c}${isV?' visited':''}">${num}</div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      })
+    }).addTo(leafletMap);
+    m.on('click', () => scrollToCard(r.id));
+    markerById[r.id] = m;
   });
 }
 
@@ -1073,12 +1020,11 @@ function toggleFullscreen() {
   if (isFs) {
     renderMapSidebar();
     document.body.style.overflow = 'hidden';
-    // viewBox 초기화
-    const svg = panel.querySelector('svg');
-    if (svg && svg._baseVB) svg.setAttribute('viewBox', svg._baseVB.join(' '));
   } else {
     document.body.style.overflow = '';
   }
+  // Leaflet 리사이즈 반영
+  setTimeout(() => { if (leafletMap) leafletMap.invalidateSize(); }, 100);
 }
 
 function renderMapSidebar() {
@@ -1125,17 +1071,20 @@ function renderMapSidebar() {
 
 function focusPin(id) {
   const r = getAllR().find(x => x.id === id);
-  if (!r || !r.x) return;
-  const svg = document.querySelector('.map-panel svg');
-  if (!svg) return;
-  // 포커스 viewBox
-  svg.setAttribute('viewBox', `${r.x-180} ${r.y-130} 360 260`);
-  // 핀 강조
-  document.querySelectorAll('.pin-group').forEach(p => p.classList.remove('highlight'));
-  const pin = document.querySelector(`.pin-group[data-id="${id}"]`);
-  if (pin) {
-    pin.classList.add('highlight');
-    setTimeout(() => pin.classList.remove('highlight'), 3000);
+  if (!r || !r.lat || !leafletMap) return;
+  leafletMap.setView([r.lat, r.lng], 17, { animate: true });
+  const marker = markerById[id];
+  if (marker) {
+    // 하이라이트 효과
+    const el = marker.getElement();
+    if (el) {
+      const inner = el.querySelector('.r-pin');
+      if (inner) {
+        inner.classList.add('highlight');
+        setTimeout(() => inner.classList.remove('highlight'), 2500);
+      }
+    }
+    marker.openPopup && marker.openPopup();
   }
 }
 
@@ -1348,172 +1297,16 @@ function installApp() {
   });
 }
 
-/* ===== SVG 핀치 줌·팬 ===== */
-(function() {
-  const svg = document.querySelector('.map-panel svg');
-  if (!svg) return;
-  const baseVB = svg.getAttribute('viewBox').split(/\s+/).map(Number);
-  svg._baseVB = baseVB;
-  svg.addEventListener('dblclick', () => svg.setAttribute('viewBox', baseVB.join(' ')));
-  let vb = [...baseVB];
-  let touches = [];
-  let isPanning = false;
-  let lastPoint = null;
-  let lastDist = 0;
-
-  function applyVB() {
-    svg.setAttribute('viewBox', vb.join(' '));
-  }
-  function clamp() {
-    const [bx,by,bw,bh] = baseVB;
-    if (vb[2] > bw) vb[2] = bw;
-    if (vb[3] > bh) vb[3] = bh;
-    if (vb[2] < bw*0.3) vb[2] = bw*0.3;
-    if (vb[3] < bh*0.3) vb[3] = bh*0.3;
-    if (vb[0] < bx) vb[0] = bx;
-    if (vb[1] < by) vb[1] = by;
-    if (vb[0]+vb[2] > bx+bw) vb[0] = bx+bw-vb[2];
-    if (vb[1]+vb[3] > by+bh) vb[1] = by+bh-vb[3];
-  }
-  function distance(a, b) {
-    return Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
-  }
-  function toSVG(clientX, clientY) {
-    const rect = svg.getBoundingClientRect();
-    const sx = (clientX - rect.left) / rect.width;
-    const sy = (clientY - rect.top) / rect.height;
-    return { x: vb[0] + sx * vb[2], y: vb[1] + sy * vb[3] };
-  }
-
-  let pinching = false;
-  let lastTap = 0;
-  let touchStartPos = null;
-  let hasPanned = false;
-
-  svg.addEventListener('touchstart', (e) => {
-    touches = [...e.touches];
-    if (touches.length === 2) {
-      e.preventDefault();  // 핀치만 preventDefault
-      pinching = true;
-      lastDist = distance(touches[0], touches[1]);
-    } else if (touches.length === 1) {
-      // 1손가락은 preventDefault 안 함 → tap→click 이벤트 정상 발생
-      touchStartPos = { x: touches[0].clientX, y: touches[0].clientY };
-      lastPoint = { x: touches[0].clientX, y: touches[0].clientY };
-      isPanning = false;
-      hasPanned = false;
-    }
-  }, { passive: false });
-
-  svg.addEventListener('touchmove', (e) => {
-    const t = [...e.touches];
-    if (t.length === 2) {
-      e.preventDefault();
-      pinching = true;
-      const d = distance(t[0], t[1]);
-      if (d === 0 || lastDist === 0) { lastDist = d; return; }
-      const scale = lastDist / d;
-      const cx = (t[0].clientX + t[1].clientX) / 2;
-      const cy = (t[0].clientY + t[1].clientY) / 2;
-      const rect = svg.getBoundingClientRect();
-      const center = toSVG(cx, cy);
-      const newW = vb[2] * scale;
-      const newH = vb[3] * scale;
-      vb[0] = center.x - (cx - rect.left) / rect.width * newW;
-      vb[1] = center.y - (cy - rect.top) / rect.height * newH;
-      vb[2] = newW;
-      vb[3] = newH;
-      clamp();
-      applyVB();
-      lastDist = d;
-    } else if (t.length === 1 && lastPoint && !pinching) {
-      // 일정 거리 이상 움직이면 팬으로 전환 (핀 탭 오작동 방지)
-      const dx = t[0].clientX - touchStartPos.x;
-      const dy = t[0].clientY - touchStartPos.y;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 10 || hasPanned) {
-        hasPanned = true;
-        isPanning = true;
-        e.preventDefault();
-        const rect = svg.getBoundingClientRect();
-        const mx = (t[0].clientX - lastPoint.x) / rect.width * vb[2];
-        const my = (t[0].clientY - lastPoint.y) / rect.height * vb[3];
-        vb[0] -= mx;
-        vb[1] -= my;
-        clamp();
-        applyVB();
-        lastPoint = { x: t[0].clientX, y: t[0].clientY };
-      }
-    }
-  }, { passive: false });
-
-  svg.addEventListener('touchend', (e) => {
-    // 모든 손가락 떼짐
-    if (e.touches.length === 0) {
-      const wasPinching = pinching;
-      pinching = false;
-      isPanning = false;
-      lastPoint = null;
-      lastDist = 0;
-      touches = [];
-
-      // 핀치 직후엔 더블탭 검사 건너뛰기
-      if (!wasPinching) {
-        const now = Date.now();
-        if (now - lastTap < 300 && lastTap !== 0) {
-          vb = [...baseVB];
-          applyVB();
-          lastTap = 0;
-        } else {
-          lastTap = now;
-        }
-      } else {
-        lastTap = 0;
-      }
-    } else if (e.touches.length === 1) {
-      // 핀치 중 한 손가락만 남음 → 팬 모드 재진입 방지
-      lastPoint = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }
+/* ===== Leaflet 지도 초기화 (DOMContentLoaded 후) ===== */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof L !== 'undefined') initMap();
+    else window.addEventListener('load', initMap);
   });
-
-  // 데스크톱 휠 줌
-  svg.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    const rect = svg.getBoundingClientRect();
-    const cx = e.clientX, cy = e.clientY;
-    const center = toSVG(cx, cy);
-    const scale = e.deltaY > 0 ? 1.15 : 0.87;
-    const newW = vb[2] * scale;
-    const newH = vb[3] * scale;
-    vb[0] = center.x - (cx - rect.left) / rect.width * newW;
-    vb[1] = center.y - (cy - rect.top) / rect.height * newH;
-    vb[2] = newW; vb[3] = newH;
-    clamp();
-    applyVB();
-  }, { passive: false });
-
-  // 데스크톱 드래그 팬 (마우스)
-  let mouseDown = null;
-  svg.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.pin-group')) return;
-    mouseDown = { x: e.clientX, y: e.clientY };
-    svg.style.cursor = 'grabbing';
-  });
-  window.addEventListener('mousemove', (e) => {
-    if (!mouseDown) return;
-    const rect = svg.getBoundingClientRect();
-    const dx = (e.clientX - mouseDown.x) / rect.width * vb[2];
-    const dy = (e.clientY - mouseDown.y) / rect.height * vb[3];
-    vb[0] -= dx; vb[1] -= dy;
-    clamp();
-    applyVB();
-    mouseDown = { x: e.clientX, y: e.clientY };
-  });
-  window.addEventListener('mouseup', () => {
-    mouseDown = null;
-    svg.style.cursor = '';
-  });
-})();
+} else {
+  if (typeof L !== 'undefined') initMap();
+  else window.addEventListener('load', initMap);
+}
 </script>
 </body>
 </html>

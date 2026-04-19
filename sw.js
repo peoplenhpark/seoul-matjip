@@ -1,10 +1,12 @@
 /* Service Worker: 서울 4대문 안 맛집 체크리스트 PWA */
-const CACHE = 'seoul-matjip-v3';
+const CACHE = 'seoul-matjip-v4';
 const ASSETS = [
   './',
   './seoul_restaurants.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
 ];
 
 self.addEventListener('install', (e) => {
