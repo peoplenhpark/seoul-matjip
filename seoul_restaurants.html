@@ -341,30 +341,41 @@
   .hdr-btn:hover { background: rgba(255,255,255,0.28); }
 
   /* 코스 섹션 (5개 한 줄 강제) */
+  /* 코스 카드 — 세로 긴 직사각형, 5개 중첩없이 */
   .course-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 4px; padding: 4px 0 8px;
-    margin-bottom: 10px;
+    gap: 6px; padding: 6px 0 10px;
+    margin: 0 auto 10px;
+    max-width: 420px;
   }
   .course-card {
-    background: linear-gradient(135deg, #fff6e0, #fde8b8);
-    border: 2px solid #d8b068; border-radius: 8px; padding: 5px 2px 4px;
+    background: linear-gradient(155deg, #fff6e0, #fde8b8);
+    border: 2px solid #d8b068; border-radius: 10px;
+    padding: 10px 4px 8px;
+    aspect-ratio: 3 / 4;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
     text-align: center; cursor: pointer; transition: all 0.15s;
     overflow: hidden; min-width: 0;
   }
-  .course-card:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-  .course-card.active { background: linear-gradient(135deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
-  .course-card .c-icon { font-size: 19px; display: block; line-height: 1; }
-  .course-card .c-title { font-size: 9.5px; font-weight: 900; margin: 2px 0 1px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .course-card:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+  .course-card.active { background: linear-gradient(155deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
+  .course-card .c-icon { font-size: 22px; line-height: 1.2; }
+  .course-card .c-title {
+    font-size: 10px; font-weight: 900; line-height: 1.2;
+    word-break: keep-all; overflow-wrap: break-word;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
   .course-card .c-desc { display: none; }
-  .course-card .c-count { font-size: 8.5px; font-weight: 700; opacity: 0.8; }
+  .course-card .c-count { font-size: 9px; font-weight: 700; opacity: 0.85; }
 
   @media (min-width: 640px) {
-    .course-card { padding: 7px 4px 5px; }
-    .course-card .c-icon { font-size: 24px; }
-    .course-card .c-title { font-size: 11.5px; }
-    .course-card .c-count { font-size: 10px; }
+    .course-row { max-width: 520px; gap: 8px; }
+    .course-card { padding: 14px 6px 10px; }
+    .course-card .c-icon { font-size: 28px; }
+    .course-card .c-title { font-size: 12px; }
+    .course-card .c-count { font-size: 10.5px; }
   }
   .course-banner {
     padding: 12px; margin-bottom: 12px; border-radius: 8px;
@@ -460,7 +471,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.0</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.1</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
