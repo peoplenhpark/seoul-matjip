@@ -73,10 +73,10 @@
     .map-panel svg { max-height: calc(45vh - 42px); object-fit: contain; }
     .map-toggle {
       display: flex !important;
-      position: absolute; top: 6px; right: 8px; z-index: 5;
+      position: absolute; bottom: 6px; right: 8px; z-index: 5;
       background: rgba(90,58,26,0.9); color: #fff6e0;
-      border: none; border-radius: 18px; padding: 6px 12px;
-      font-weight: 900; font-size: 12px; cursor: pointer;
+      border: none; border-radius: 18px; padding: 5px 10px;
+      font-weight: 900; font-size: 11px; cursor: pointer;
     }
     .list-panel { min-width: auto; }
   }
@@ -114,14 +114,17 @@
   .pin-group.highlight circle.pin-fill { stroke: #ffd700 !important; stroke-width: 4; }
   .pin-group .pin-hit { fill: transparent; }
 
-  /* 지도 확대 버튼 */
-  .map-expand-btn {
-    position: absolute; top: 10px; left: 10px; z-index: 6;
-    background: rgba(90,58,26,0.92); color: #fff6e0;
-    border: none; border-radius: 18px; padding: 6px 12px;
+  /* 지도 버튼 (좌상단 ⛶ / 우상단 📜) */
+  .map-expand-btn, .map-detail-btn {
+    position: absolute; top: 8px; z-index: 6;
+    border: none; border-radius: 16px; padding: 5px 10px;
     font-weight: 900; font-size: 12px; cursor: pointer;
+    text-decoration: none; display: inline-block;
   }
+  .map-expand-btn { left: 8px; background: rgba(90,58,26,0.92); color: #fff6e0; }
   .map-expand-btn:hover { background: #5a3a1a; }
+  .map-detail-btn { right: 8px; background: rgba(90,58,26,0.92); color: #fff6e0; }
+  .map-detail-btn:hover { background: #5a3a1a; }
   .map-panel { position: relative; }
 
   /* 지도 사이드바 (기본 숨김, 확대 시 표시) */
@@ -293,34 +296,31 @@
   }
   .hdr-btn:hover { background: rgba(255,255,255,0.28); }
 
-  /* 코스 섹션 (4칸 한화면 보장, 5번째는 오른쪽 스크롤) */
+  /* 코스 섹션 (5개 한 줄) */
   .course-row {
     display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: calc((100% - 18px) / 4);
-    gap: 6px; overflow-x: auto; padding: 6px 0 8px;
-    margin-bottom: 10px; scrollbar-width: thin;
-    scroll-snap-type: x mandatory;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px; padding: 4px 0 8px;
+    margin-bottom: 10px;
   }
   .course-card {
-    scroll-snap-align: start;
     background: linear-gradient(135deg, #fff6e0, #fde8b8);
-    border: 2px solid #d8b068; border-radius: 10px; padding: 6px 3px 5px;
+    border: 2px solid #d8b068; border-radius: 8px; padding: 5px 2px 4px;
     text-align: center; cursor: pointer; transition: all 0.15s;
-    overflow: hidden;
+    overflow: hidden; min-width: 0;
   }
   .course-card:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
   .course-card.active { background: linear-gradient(135deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
-  .course-card .c-icon { font-size: 22px; display: block; line-height: 1; }
-  .course-card .c-title { font-size: 10.5px; font-weight: 900; margin: 3px 0 1px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .course-card .c-icon { font-size: 19px; display: block; line-height: 1; }
+  .course-card .c-title { font-size: 9.5px; font-weight: 900; margin: 2px 0 1px; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .course-card .c-desc { display: none; }
-  .course-card .c-count { font-size: 9px; font-weight: 700; opacity: 0.8; }
+  .course-card .c-count { font-size: 8.5px; font-weight: 700; opacity: 0.8; }
 
-  @media (min-width: 960px) {
-    .course-card { padding: 8px 6px 6px; }
-    .course-card .c-icon { font-size: 26px; }
-    .course-card .c-title { font-size: 12px; }
-    .course-card .c-count { font-size: 10.5px; }
+  @media (min-width: 640px) {
+    .course-card { padding: 7px 4px 5px; }
+    .course-card .c-icon { font-size: 24px; }
+    .course-card .c-title { font-size: 11.5px; }
+    .course-card .c-count { font-size: 10px; }
   }
   .course-banner {
     padding: 12px; margin-bottom: 12px; border-radius: 8px;
@@ -432,24 +432,16 @@
 <!-- ============ 지도 패널 ============ -->
 <div class="map-panel" id="mapPanel">
 <button class="map-expand-btn" onclick="toggleFullscreen()">⛶ 크게보기</button>
-<button class="map-toggle" id="mapToggle" onclick="toggleMap()">🗺️ 지도 접기</button>
+<a class="map-detail-btn" href="seoul_4daemun.html" target="_blank" rel="noopener">📜 상세 지도</a>
+<button class="map-toggle" id="mapToggle" onclick="toggleMap()">🗺️ 접기</button>
 <div class="map-sidebar" id="mapSidebar"></div>
-<svg viewBox="0 0 1400 900" xmlns="http://www.w3.org/2000/svg">
-  <!-- 간단 지도: 핀 가독성·터치 줌 최적화 -->
-  <rect width="1400" height="900" fill="#fef6e0"/>
-  <rect x="40" y="40" width="1320" height="820" fill="none" stroke="#c0a068" stroke-width="2" rx="16"/>
-
-  <text x="700" y="58" text-anchor="middle" font-size="22" font-weight="900" fill="#5a3a1a">서울 4대문 안 · 맛집 지도</text>
+<svg viewBox="40 210 1260 650" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <!-- 크롭된 viewBox: 상단 제목·산 영역 제거, 우측 여백 축소 -->
+  <rect x="40" y="210" width="1260" height="650" fill="#fef6e0"/>
+  <rect x="50" y="220" width="1240" height="630" fill="none" stroke="#c0a068" stroke-width="2" rx="12"/>
 
   <!-- 한양도성 경계 -->
-  <path d="M130,270 Q75,540 230,800 Q700,880 1170,790 Q1320,530 1250,270" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
-
-  <!-- 산 라벨 -->
-  <g fill="#3a5a2a" font-size="16" font-weight="900">
-    <text x="200" y="160">△ 인왕산</text>
-    <text x="450" y="155">△ 북악산</text>
-    <text x="920" y="160">△ 낙산</text>
-  </g>
+  <path d="M130,260 Q75,540 230,800 Q700,860 1170,790 Q1290,540 1230,260" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
 
   <!-- 3대 궁·종묘 (얕은 블록) -->
   <g fill="#f3e4c5" stroke="#b88e58" stroke-width="2">
@@ -520,17 +512,11 @@
   <circle cx="570" cy="735" r="14" fill="#e07a92" stroke="#6a4020" stroke-width="2"/>
   <text x="557" y="739" font-size="11" font-weight="900" fill="#fff">명동</text>
 
-  <!-- 상세 지도 링크 (오른쪽 상단) -->
-  <a href="seoul_4daemun.html" target="_blank">
-    <rect x="1170" y="45" width="180" height="32" rx="16" fill="#5a3a1a"/>
-    <text x="1260" y="66" text-anchor="middle" fill="#fff6e0" font-size="13" font-weight="900">📜 상세 지도 보기 →</text>
-  </a>
-
   <!-- 나침반 -->
-  <g transform="translate(80,270)">
-    <circle r="22" fill="#fff6e0" stroke="#6a4020" stroke-width="2"/>
-    <polygon points="0,-18 5,0 0,18 -5,0" fill="#d87050"/>
-    <text x="-5" y="-28" font-size="12" font-weight="900" fill="#5a2a1a">N</text>
+  <g transform="translate(95,250)">
+    <circle r="18" fill="#fff6e0" stroke="#6a4020" stroke-width="2"/>
+    <polygon points="0,-14 4,0 0,14 -4,0" fill="#d87050"/>
+    <text x="-4" y="-22" font-size="11" font-weight="900" fill="#5a2a1a">N</text>
   </g>
 
   <!-- ===== 식당 핀 (JS로 생성) ===== -->
