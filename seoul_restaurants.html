@@ -350,31 +350,34 @@
     max-width: 420px;
   }
   .course-card {
-    height: 100px;  /* 고정 높이 */
+    height: 105px;  /* 고정 높이 */
     background: linear-gradient(155deg, #fff6e0, #fde8b8);
     border: 2px solid #d8b068; border-radius: 10px;
-    padding: 8px 3px 6px;
+    padding: 8px 2px 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
     text-align: center; cursor: pointer; transition: all 0.15s;
     overflow: hidden; min-width: 0;
   }
   .course-card:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
   .course-card.active { background: linear-gradient(155deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
-  .course-card .c-icon { font-size: 22px; line-height: 1; }
+  .course-card .c-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
   .course-card .c-title {
-    font-size: 10.5px; font-weight: 900; line-height: 1.25;
-    word-break: keep-all;
-    flex: 1; display: flex; align-items: center; justify-content: center;
+    flex: 1; width: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 2px 0;
   }
+  .course-card .ct-line {
+    font-size: 10.5px; font-weight: 900; line-height: 1.25;
+    color: inherit;
+  }
   .course-card .c-desc { display: none; }
-  .course-card .c-count { font-size: 9px; font-weight: 700; opacity: 0.85; }
+  .course-card .c-count { font-size: 9.5px; font-weight: 700; opacity: 0.85; flex-shrink: 0; }
 
   @media (min-width: 640px) {
     .course-row { max-width: 520px; gap: 8px; }
     .course-card { height: 120px; padding: 12px 6px 8px; }
     .course-card .c-icon { font-size: 26px; }
-    .course-card .c-title { font-size: 12px; }
+    .course-card .ct-line { font-size: 12px; }
     .course-card .c-count { font-size: 10.5px; }
   }
   .course-banner {
@@ -471,7 +474,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.3</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.4</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -760,11 +763,11 @@ let filter = 'all';
 let activeCourse = null;
 
 const COURSES = [
-  { id:'lunch', icon:'🌅', title:'광화문<br>런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
-  { id:'hanok', icon:'🏛️', title:'북촌<br>한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
-  { id:'night', icon:'🌙', title:'명동<br>야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
-  { id:'michelin', icon:'🥇', title:'미쉐린', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
-  { id:'nopo', icon:'🕰️', title:'노포<br>투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
+  { id:'lunch', icon:'🌅', t1:'광화문', t2:'런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
+  { id:'hanok', icon:'🏛️', t1:'북촌', t2:'한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
+  { id:'night', icon:'🌙', t1:'명동', t2:'야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
+  { id:'michelin', icon:'🥇', t1:'미쉐린', t2:'', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
+  { id:'nopo', icon:'🕰️', t1:'노포', t2:'투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
 ];
 
 /* 주요 랜드마크 10곳 + 4대문 (공식 GPS) */
@@ -1000,17 +1003,17 @@ function renderCourses() {
     const done = c.ids.filter(id => visited.includes(id)).length;
     return `<div class="course-card ${activeCourse===c.id?'active':''}" onclick="toggleCourse('${c.id}')">
       <div class="c-icon">${c.icon}</div>
-      <div class="c-title">${c.title}</div>
-      <div class="c-desc">${c.desc}</div>
-      <div class="c-count">${done}/${c.ids.length} 완료</div>
+      <div class="c-title"><div class="ct-line">${c.t1}</div>${c.t2?`<div class="ct-line">${c.t2}</div>`:''}</div>
+      <div class="c-count">${done}/${c.ids.length}</div>
     </div>`;
   }).join('');
 
   if (activeCourse) {
     const c = COURSES.find(x => x.id === activeCourse);
+    const fullTitle = c.t1 + (c.t2 ? ' ' + c.t2 : '');
     banner.innerHTML = `<div class="course-banner">
       <button class="close-course" onclick="toggleCourse(null)">×</button>
-      ${c.icon} <strong>${c.title}</strong> · ${c.desc} (${c.ids.length}곳)
+      ${c.icon} <strong>${fullTitle}</strong> · ${c.desc} (${c.ids.length}곳)
     </div>`;
   } else {
     banner.innerHTML = '';
