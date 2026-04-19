@@ -58,7 +58,7 @@
 
   .app { display: flex; gap: 16px; padding: 16px; max-width: 1800px; margin: 0 auto; }
   .map-panel { flex: 1.25; position: sticky; top: 80px; align-self: flex-start; max-height: calc(100vh - 96px); }
-  .map-panel svg { width: 100%; height: auto; background: var(--paper); border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.12); display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+  .map-panel svg { width: 100%; height: auto; background: var(--paper); border-radius: 10px; box-shadow: 0 3px 12px rgba(0,0,0,0.12); display: block; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
   .list-panel { flex: 1; min-width: 360px; }
 
   /* Tablet */
@@ -420,7 +420,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.3</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.4</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -441,9 +441,9 @@
 </div>
 <div class="map-panel" id="mapPanel">
 <div class="map-sidebar" id="mapSidebar"></div>
-<svg viewBox="75 230 1210 610" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-  <!-- 크롭된 viewBox: 내부 여백·장식 테두리 제거, 콘텐츠 꽉 채움 -->
-  <rect x="75" y="230" width="1210" height="610" fill="#fef6e0"/>
+<svg viewBox="30 200 1300 680" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+  <!-- viewBox 여백 추가: 텍스트 라벨이 가장자리에 붙지 않도록 -->
+  <rect x="30" y="200" width="1300" height="680" fill="#fef6e0"/>
 
   <!-- 한양도성 경계 -->
   <path d="M130,260 Q80,540 230,800 Q700,860 1170,790 Q1280,540 1230,260" fill="none" stroke="#d87050" stroke-width="4" stroke-dasharray="12 7" opacity="0.6"/>
@@ -1334,17 +1334,21 @@ function installApp() {
 
   let pinching = false;
   let lastTap = 0;
+  let touchStartPos = null;
+  let hasPanned = false;
 
   svg.addEventListener('touchstart', (e) => {
     touches = [...e.touches];
     if (touches.length === 2) {
-      e.preventDefault();
+      e.preventDefault();  // 핀치만 preventDefault
       pinching = true;
       lastDist = distance(touches[0], touches[1]);
     } else if (touches.length === 1) {
-      e.preventDefault();
-      isPanning = true;
+      // 1손가락은 preventDefault 안 함 → tap→click 이벤트 정상 발생
+      touchStartPos = { x: touches[0].clientX, y: touches[0].clientY };
       lastPoint = { x: touches[0].clientX, y: touches[0].clientY };
+      isPanning = false;
+      hasPanned = false;
     }
   }, { passive: false });
 
@@ -1369,16 +1373,24 @@ function installApp() {
       clamp();
       applyVB();
       lastDist = d;
-    } else if (t.length === 1 && isPanning && lastPoint && !pinching) {
-      e.preventDefault();
-      const rect = svg.getBoundingClientRect();
-      const dx = (t[0].clientX - lastPoint.x) / rect.width * vb[2];
-      const dy = (t[0].clientY - lastPoint.y) / rect.height * vb[3];
-      vb[0] -= dx;
-      vb[1] -= dy;
-      clamp();
-      applyVB();
-      lastPoint = { x: t[0].clientX, y: t[0].clientY };
+    } else if (t.length === 1 && lastPoint && !pinching) {
+      // 일정 거리 이상 움직이면 팬으로 전환 (핀 탭 오작동 방지)
+      const dx = t[0].clientX - touchStartPos.x;
+      const dy = t[0].clientY - touchStartPos.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 10 || hasPanned) {
+        hasPanned = true;
+        isPanning = true;
+        e.preventDefault();
+        const rect = svg.getBoundingClientRect();
+        const mx = (t[0].clientX - lastPoint.x) / rect.width * vb[2];
+        const my = (t[0].clientY - lastPoint.y) / rect.height * vb[3];
+        vb[0] -= mx;
+        vb[1] -= my;
+        clamp();
+        applyVB();
+        lastPoint = { x: t[0].clientX, y: t[0].clientY };
+      }
     }
   }, { passive: false });
 
