@@ -71,7 +71,8 @@
       background: var(--paper);
       margin: 0;
     }
-    .map-panel.collapsed { max-height: 42px; }
+    .map-panel.collapsed { max-height: 0; border: none; }
+    .map-panel.collapsed svg { display: none; }
     .map-panel svg { display: block; width: 100%; height: auto; }
     .map-toggle {
       display: flex !important;
@@ -90,8 +91,8 @@
     header h1 { font-size: 17px; width: 100%; }
     .progress-wrap { width: 100%; justify-content: space-between; }
     .progress-bar { max-width: none; }
-    .map-panel { top: 96px; }
-    .app { padding: 6px; }
+    .app { padding: 0; }
+    .map-panel { width: 100%; }
     .filters { padding: 8px; gap: 5px; overflow-x: auto; flex-wrap: nowrap; }
     .filters button { padding: 8px 12px; font-size: 12px; white-space: nowrap; flex-shrink: 0; }
     .card-detail dl { grid-template-columns: 1fr; gap: 2px 0; }
@@ -115,17 +116,19 @@
   .pin-group.highlight circle.pin-fill { stroke: #ffd700 !important; stroke-width: 4; }
   .pin-group .pin-hit { fill: transparent; }
 
-  /* 지도 버튼 (좌상단 ⛶ / 우상단 📜) */
-  .map-expand-btn, .map-detail-btn {
-    position: absolute; top: 8px; z-index: 6;
-    border: none; border-radius: 16px; padding: 5px 10px;
-    font-weight: 900; font-size: 12px; cursor: pointer;
-    text-decoration: none; display: inline-block;
+  /* 지도 툴바 (지도 위에 위치) */
+  .map-toolbar {
+    display: flex; gap: 4px; padding: 4px 6px;
+    background: var(--paper); align-items: center;
   }
-  .map-expand-btn { left: 8px; background: rgba(90,58,26,0.92); color: #fff6e0; }
-  .map-expand-btn:hover { background: #5a3a1a; }
-  .map-detail-btn { right: 8px; background: rgba(90,58,26,0.92); color: #fff6e0; }
-  .map-detail-btn:hover { background: #5a3a1a; }
+  .map-toolbar .btn {
+    flex: 1; padding: 6px 4px; background: #5a3a1a; color: #fff6e0;
+    border: none; border-radius: 6px; font-weight: 900; font-size: 12px;
+    text-decoration: none; text-align: center; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .map-toolbar .btn:hover { background: #3a2a10; }
+  .map-expand-btn, .map-detail-btn { display: none; }
   .map-panel { position: relative; }
 
   /* 지도 사이드바 (기본 숨김, 확대 시 표시) */
@@ -250,8 +253,8 @@
 
   .uncert { display: inline-block; background: #ffd766; color: #5a3a00; padding: 1px 6px; border-radius: 3px; font-size: 10px; font-weight: 900; margin-left: 4px; }
 
-  /* 영업 상태 뱃지 */
-  .status-badge { font-size: 11px; font-weight: 900; padding: 3px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
+  /* 영업 상태 뱃지 (card-actions 안에 있음) */
+  .status-badge { font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 12px; white-space: nowrap; display: inline-block; }
   .status-badge.open { background: #d4f0d0; color: #1a6a20; }
   .status-badge.closing { background: #ffe4a8; color: #8a4a00; }
   .status-badge.break { background: #fde5a8; color: #8a5a00; }
@@ -417,7 +420,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.2</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v2.3</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -431,10 +434,12 @@
 <div class="app">
 
 <!-- ============ 지도 패널 ============ -->
+<div class="map-toolbar" id="mapToolbar">
+  <button class="btn" onclick="toggleFullscreen()">⛶ 크게보기</button>
+  <a class="btn" href="seoul_4daemun.html" target="_blank" rel="noopener">📜 상세 지도</a>
+  <button class="btn" id="mapToggleBtn" onclick="toggleMap()">🗺️ 접기</button>
+</div>
 <div class="map-panel" id="mapPanel">
-<button class="map-expand-btn" onclick="toggleFullscreen()">⛶ 크게보기</button>
-<a class="map-detail-btn" href="seoul_4daemun.html" target="_blank" rel="noopener">📜 상세 지도</a>
-<button class="map-toggle" id="mapToggle" onclick="toggleMap()">🗺️ 접기</button>
 <div class="map-sidebar" id="mapSidebar"></div>
 <svg viewBox="75 230 1210 610" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
   <!-- 크롭된 viewBox: 내부 여백·장식 테두리 제거, 콘텐츠 꽉 채움 -->
@@ -888,9 +893,9 @@ function renderPins() {
 
 function toggleMap() {
   const panel = document.getElementById('mapPanel');
-  const btn = document.getElementById('mapToggle');
+  const btn = document.getElementById('mapToggleBtn');
   panel.classList.toggle('collapsed');
-  btn.textContent = panel.classList.contains('collapsed') ? '🗺️ 지도 펼치기' : '🗺️ 지도 접기';
+  if (btn) btn.textContent = panel.classList.contains('collapsed') ? '🗺️ 펼치기' : '🗺️ 접기';
 }
 
 function renderList() {
@@ -932,11 +937,11 @@ function renderList() {
             <div class="card-name">${r.n} ${isCustom?'<span class="custom-badge">내 맛집</span>':''}</div>
             <div class="card-meta">${r.v||''}${r.v && r.a?' · ':''}${r.a||''}</div>
           </div>
-          ${status ? `<div class="status-badge ${status.cls}">${status.label}</div>` : ''}
           <div class="card-arrow">›</div>
         </div>
         ${r.b ? `<div class="card-brief">${r.b}</div>` : ''}
         <div class="card-actions">
+          ${status ? `<div class="status-badge ${status.cls}">${status.label}</div>` : ''}
           ${urls.tel ? `<a class="qa phone" href="${urls.tel}" onclick="event.stopPropagation()">📞 전화</a>` : ''}
           <a class="qa map" href="${urls.kakao}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺️ 지도</a>
           <a class="qa book" href="${urls.catchtable}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📅 예약</a>
