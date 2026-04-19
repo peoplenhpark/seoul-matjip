@@ -1,5 +1,5 @@
 /* Service Worker: 서울 4대문 안 맛집 체크리스트 PWA */
-const CACHE = 'seoul-matjip-v1';
+const CACHE = 'seoul-matjip-v3';
 const ASSETS = [
   './',
   './seoul_restaurants.html',
@@ -21,19 +21,16 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+/* Network-first 전략: 항상 최신 시도, 오프라인 시 캐시 폴백 */
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(resp => {
-        // 동일 오리진 리소스만 캐시 업데이트
-        if (resp && resp.status === 200 && e.request.url.startsWith(self.location.origin)) {
-          const clone = resp.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-        }
-        return resp;
-      }).catch(() => cached);
-    })
+    fetch(e.request).then(resp => {
+      if (resp && resp.status === 200 && e.request.url.startsWith(self.location.origin)) {
+        const clone = resp.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+      }
+      return resp;
+    }).catch(() => caches.match(e.request))
   );
 });
