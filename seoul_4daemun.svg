@@ -296,4 +296,114 @@
     <text x="18" y="52" font-size="13" fill="#5a2a1a"><tspan fill="#6a3a1a">종로</tspan> ① 광화문·교보 → ② 종각·탑골 → ③ 낙원·단성사·종묘 → ④ 세운상가 → ⑤ 광장시장 → ⑥ 동대문</text>
     <text x="18" y="72" font-size="13" fill="#5a2a1a"><tspan fill="#1e3450">을지로</tspan> ① 롯데·시청 → ② 하나銀 → ③ 한국은행·명동 → ④ 중부시장 → ⑤ 방산시장 → ⑥ 오장동 → ⑦ DDP·두타</text>
   </g>
+
+  <!-- ===== 지하철 역 (수도권 1~5호선) ===== -->
+  <g id="subway" filter="url(#pencil)">
+    <!-- 1호선 (파랑) -->
+    <g transform="translate(365,510)">
+      <circle r="9" fill="#0052A4" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">1</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">종각</text>
+    </g>
+    <g transform="translate(920,510)">
+      <circle r="9" fill="#0052A4" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">1</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">종로5가</text>
+    </g>
+
+    <!-- 2호선 (초록) -->
+    <g transform="translate(295,675)">
+      <circle r="9" fill="#00A84D" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">2</text>
+      <text y="26" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">을지로입구</text>
+    </g>
+
+    <!-- 3호선 (주황) -->
+    <g transform="translate(370,330)">
+      <circle r="9" fill="#EF7C1C" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">3</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">경복궁</text>
+    </g>
+    <g transform="translate(700,405)">
+      <circle r="9" fill="#EF7C1C" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">3</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">안국</text>
+    </g>
+
+    <!-- 4호선 (하늘) -->
+    <g transform="translate(590,755)">
+      <circle r="9" fill="#00A5DE" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">4</text>
+      <text y="26" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">명동</text>
+    </g>
+    <g transform="translate(465,820)">
+      <circle r="9" fill="#00A5DE" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">4</text>
+      <text y="26" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">회현</text>
+    </g>
+
+    <!-- 5호선 (보라) -->
+    <g transform="translate(480,445)">
+      <circle r="9" fill="#996CAC" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">5</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">광화문</text>
+    </g>
+    <g transform="translate(110,510)">
+      <circle r="9" fill="#996CAC" stroke="#fff" stroke-width="2"/>
+      <text y="3" text-anchor="middle" font-size="11" fill="#fff" font-weight="900">5</text>
+      <text y="-14" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">서대문</text>
+    </g>
+
+    <!-- 환승역 (여러 호선) -->
+    <g transform="translate(480,635)">
+      <rect x="-13" y="-9" width="26" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-6" r="7" fill="#0052A4"/>
+      <text x="-6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">1</text>
+      <circle cx="6" r="7" fill="#00A84D"/>
+      <text x="6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">2</text>
+      <text y="28" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">시청</text>
+    </g>
+    <g transform="translate(625,510)">
+      <rect x="-20" y="-9" width="40" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-12" r="7" fill="#0052A4"/>
+      <text x="-12" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">1</text>
+      <circle cx="0" r="7" fill="#EF7C1C"/>
+      <text y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">3</text>
+      <circle cx="12" r="7" fill="#996CAC"/>
+      <text x="12" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">5</text>
+      <text y="-18" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">종로3가</text>
+    </g>
+    <g transform="translate(560,675)">
+      <rect x="-13" y="-9" width="26" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-6" r="7" fill="#00A84D"/>
+      <text x="-6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">2</text>
+      <circle cx="6" r="7" fill="#EF7C1C"/>
+      <text x="6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">3</text>
+      <text y="28" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">을지로3가</text>
+    </g>
+    <g transform="translate(700,675)">
+      <rect x="-13" y="-9" width="26" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-6" r="7" fill="#00A84D"/>
+      <text x="-6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">2</text>
+      <circle cx="6" r="7" fill="#996CAC"/>
+      <text x="6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">5</text>
+      <text y="28" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">을지로4가</text>
+    </g>
+    <g transform="translate(1140,510)">
+      <rect x="-13" y="-9" width="26" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-6" r="7" fill="#0052A4"/>
+      <text x="-6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">1</text>
+      <circle cx="6" r="7" fill="#00A5DE"/>
+      <text x="6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">4</text>
+      <text y="-18" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">동대문</text>
+    </g>
+    <g transform="translate(680,800)">
+      <rect x="-13" y="-9" width="26" height="18" rx="9" fill="#fff" stroke="#2a2a2a" stroke-width="1"/>
+      <circle cx="-6" r="7" fill="#EF7C1C"/>
+      <text x="-6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">3</text>
+      <circle cx="6" r="7" fill="#00A5DE"/>
+      <text x="6" y="3" text-anchor="middle" font-size="9" fill="#fff" font-weight="900">4</text>
+      <text y="28" text-anchor="middle" font-size="11" fill="#1a1a1a" font-weight="900">충무로</text>
+    </g>
+  </g>
 </svg>
