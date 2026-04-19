@@ -341,39 +341,40 @@
   .hdr-btn:hover { background: rgba(255,255,255,0.28); }
 
   /* 코스 섹션 (5개 한 줄 강제) */
-  /* 코스 카드 — 세로 긴 직사각형, 5개 중첩없이 */
+  /* 코스 카드 — 세로형, 고정 높이, 5개 중첩없이 */
   .course-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 6px; padding: 6px 0 10px;
+    gap: 6px; padding: 8px 8px 10px;
     margin: 0 auto 10px;
     max-width: 420px;
   }
   .course-card {
+    height: 100px;  /* 고정 높이 */
     background: linear-gradient(155deg, #fff6e0, #fde8b8);
     border: 2px solid #d8b068; border-radius: 10px;
-    padding: 10px 4px 8px;
-    aspect-ratio: 3 / 4;
+    padding: 8px 3px 6px;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
     text-align: center; cursor: pointer; transition: all 0.15s;
     overflow: hidden; min-width: 0;
   }
   .course-card:hover { transform: translateY(-2px); box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
   .course-card.active { background: linear-gradient(155deg, #e8a848, #d88838); color: #fff; border-color: #8a5a18; }
-  .course-card .c-icon { font-size: 22px; line-height: 1.2; }
+  .course-card .c-icon { font-size: 22px; line-height: 1; }
   .course-card .c-title {
     font-size: 10px; font-weight: 900; line-height: 1.2;
     word-break: keep-all; overflow-wrap: break-word;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
+    white-space: pre-line;
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 2px 0;
   }
   .course-card .c-desc { display: none; }
   .course-card .c-count { font-size: 9px; font-weight: 700; opacity: 0.85; }
 
   @media (min-width: 640px) {
     .course-row { max-width: 520px; gap: 8px; }
-    .course-card { padding: 14px 6px 10px; }
-    .course-card .c-icon { font-size: 28px; }
+    .course-card { height: 120px; padding: 12px 6px 8px; }
+    .course-card .c-icon { font-size: 26px; }
     .course-card .c-title { font-size: 12px; }
     .course-card .c-count { font-size: 10.5px; }
   }
@@ -471,7 +472,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.1</span></h1>
+  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.2</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -760,11 +761,11 @@ let filter = 'all';
 let activeCourse = null;
 
 const COURSES = [
-  { id:'lunch', icon:'🌅', title:'광화문런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
-  { id:'hanok', icon:'🏛️', title:'북촌한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
-  { id:'night', icon:'🌙', title:'명동야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
+  { id:'lunch', icon:'🌅', title:'광화문\n런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
+  { id:'hanok', icon:'🏛️', title:'북촌\n한옥', desc:'전통 한옥에서 한식·이탈리안', ids:['k5','k4','k3','s4','e4'] },
+  { id:'night', icon:'🌙', title:'명동\n야식', desc:'명동 3대장 + 라멘', ids:['k3','c1','j5'] },
   { id:'michelin', icon:'🥇', title:'미쉐린', desc:'별·빕구르망 섭렵', ids:['k5','k2','k1','k4','j3'] },
-  { id:'nopo', icon:'🕰️', title:'노포투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
+  { id:'nopo', icon:'🕰️', title:'노포\n투어', desc:'반백년 넘은 서울 노포', ids:['e1','k1','k2','k3','c3'] }
 ];
 
 /* 주요 랜드마크 10곳 + 4대문 (공식 GPS) */
