@@ -482,7 +482,7 @@
     <div class="progress-text" id="pText">0 / 30</div>
     <button class="hdr-btn" onclick="openRoulette()">🎲 룰렛</button>
     <button class="hdr-btn" onclick="openCustomForm()">➕ 추가</button>
-    <button class="reset-btn" id="installBtn" style="display:none;" onclick="installApp()">📱 앱 설치</button>
+    <button class="reset-btn" id="installBtn" onclick="installApp()">📱 앱 설치</button>
     <button class="reset-btn" onclick="if(confirm('방문 기록을 초기화할까요? 평점·메모·추가 맛집도 사라집니다.')){localStorage.removeItem('sj_visited');localStorage.removeItem('sj_visits');localStorage.removeItem('sj_custom');visited=[];visits={};customR=[];render();}">초기화</button>
   </div>
 </header>
@@ -1431,25 +1431,52 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-/* ===== 앱 설치 프롬프트 (Android) ===== */
+/* ===== 앱 설치 프롬프트 ===== */
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  const btn = document.getElementById('installBtn');
-  if (btn) btn.style.display = 'inline-block';
 });
+
+// 이미 설치 상태(standalone)면 버튼 숨김
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+if (isStandalone()) {
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'none';
+}
+
 function installApp() {
-  if (!deferredPrompt) {
-    alert('iOS: 공유 버튼 → "홈 화면에 추가"\nAndroid: 주소창 오른쪽 메뉴 → "앱 설치"');
+  // Android Chrome: 네이티브 설치 프롬프트
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      const btn = document.getElementById('installBtn');
+      if (btn) btn.style.display = 'none';
+    });
     return;
   }
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(() => {
-    deferredPrompt = null;
-    const btn = document.getElementById('installBtn');
-    if (btn) btn.style.display = 'none';
-  });
+  // iOS Safari 또는 기타: 수동 안내
+  const ua = navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(ua);
+  const isSafari = /safari/.test(ua) && !/chrome|crios|fxios/.test(ua);
+  let msg;
+  if (isIOS) {
+    msg = '📱 iOS 홈 화면 추가\n\n' +
+          '1. 하단 (또는 상단) 공유 버튼 ⬆️ 탭\n' +
+          '2. 메뉴에서 "홈 화면에 추가" 선택\n' +
+          '3. "추가" 탭하면 홈 화면에 아이콘 생성\n\n' +
+          '※ Safari로 열어야 작동합니다.';
+  } else {
+    msg = '📱 홈 화면 추가\n\n' +
+          'Android Chrome:\n' +
+          '주소창 오른쪽 ⋮ 메뉴 → "앱 설치" 또는 "홈 화면에 추가"\n\n' +
+          '잠시 후 다시 시도하시면 자동 설치 프롬프트가 뜰 수도 있습니다.';
+  }
+  alert(msg);
 }
 
 /* ===== Leaflet 지도 초기화 (DOMContentLoaded 후) ===== */
