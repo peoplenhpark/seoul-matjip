@@ -136,6 +136,30 @@
   .r-pin-c { background: var(--c-c); }
   .r-pin-s { background: var(--c-s); }
   .r-pin-e { background: var(--c-e); }
+  /* 볼거리 핀 (작고 다른 모양) */
+  .r-pin-p { background: #c08838; }
+  .r-pin-h { background: #8a6040; }
+  .r-pin-m { background: #d8884a; }
+  .r-pin-g { background: #6a8aa0; }
+  .r-pin-n { background: #6a9a5a; }
+  .r-pin.see-pin { width: 26px; height: 26px; font-size: 13px; opacity: 0.9; }
+  .r-pin.dim { opacity: 0.35 !important; }
+
+  /* 메인 탭 (맛집/볼거리) */
+  .main-tabs {
+    display: flex; gap: 4px; padding: 6px 8px 0;
+    background: var(--paper);
+  }
+  .main-tabs button {
+    flex: 1; padding: 10px 8px; border: none; background: #f0e0b0;
+    color: #5a3a1a; font-weight: 900; font-size: 14px; cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    border: 2px solid transparent; border-bottom: none;
+  }
+  .main-tabs button.active {
+    background: #fff6e0; color: #3a2a10;
+    border-color: #d8b068;
+  }
 
   /* 랜드마크 · 4대문 라벨 */
   .lmk-icon, .lmk-gate-icon { background: transparent !important; border: none !important; }
@@ -452,7 +476,7 @@
 <body>
 
 <header>
-  <h1>🍽️ 서울 4대문 안 맛집 체크리스트 <span style="font-size:10px;font-weight:700;opacity:0.7;">v3.5</span></h1>
+  <h1>🍽️🏛️ 서울 4대문 안 도심 가이드 <span style="font-size:10px;font-weight:700;opacity:0.7;">v4.0</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -483,20 +507,17 @@
     📍 호텔 제외 · <strong>4대문 안 + 서촌·북촌·삼청동·명동·장충 북쪽</strong> 맛집 30곳
   </div>
 
+  <!-- 메인 탭 (맛집 / 볼거리) -->
+  <div class="main-tabs">
+    <button id="tabEat" onclick="switchTab('eat')">🍽️ 맛집 30</button>
+    <button id="tabSee" onclick="switchTab('see')">🏛️ 볼거리 26</button>
+  </div>
+
   <!-- 추천 코스 -->
   <div id="courseBanner"></div>
   <div class="course-row" id="courseRow"></div>
 
-  <div class="filters">
-    <button class="active" data-f="all">전체</button>
-    <button data-f="w">양식</button>
-    <button data-f="k">한식</button>
-    <button data-f="j">일식</button>
-    <button data-f="c">중식</button>
-    <button data-f="s">동남아</button>
-    <button data-f="e">유럽식</button>
-    <button data-f="todo">미방문만</button>
-  </div>
+  <div class="filters" id="filtersBar"></div>
   <div id="list"></div>
 </div>
 
@@ -567,8 +588,20 @@
 </div>
 
 <script>
-const CUISINES = { w:'양식', k:'한식', j:'일식', c:'중식', s:'동남아식', e:'유럽식' };
-const COLORS = { w:'#e8a848', k:'#c05a3a', j:'#e07a92', c:'#d04040', s:'#70a860', e:'#8870d0' };
+const CUISINES = {
+  // 맛집
+  w:'양식', k:'한식', j:'일식', c:'중식', s:'동남아식', e:'유럽식',
+  // 볼거리
+  p:'궁궐·문화재', h:'한옥·골목', m:'시장·쇼핑', g:'박물관·미술관', n:'공원·광장'
+};
+const COLORS = {
+  // 맛집
+  w:'#e8a848', k:'#c05a3a', j:'#e07a92', c:'#d04040', s:'#70a860', e:'#8870d0',
+  // 볼거리
+  p:'#c08838', h:'#8a6040', m:'#d8884a', g:'#6a8aa0', n:'#6a9a5a'
+};
+const EAT_CATS = ['w','k','j','c','s','e'];
+const SEE_CATS = ['p','h','m','g','n'];
 
 const R = [
   // 양식 w1-w5 (아메리칸·스테이크·버거)
@@ -734,11 +767,103 @@ const R = [
     menu:'스테이크 프리트, 에스카르고, 크렘브륄레', tip:'프렌치 입문 코스.' },
 ];
 
+// ===== 볼거리 26곳 =====
+const S = [
+  // 궁궐·문화재 p1-p6
+  { id:'p1', cat:'p', n:'경복궁', a:'종로구 사직로 161', lat:37.5796, lng:126.9770,
+    b:'조선 정궁, 광화문 정문', desc:'1395년 창건된 조선 5대 궁 중 가장 큰 궁궐. 광화문·근정전·경회루.',
+    hours:'09:00-18:00 (화 휴궁)', fee:'3,000원 (한복 무료)', tip:'수문장 교대식 10:00·14:00.' },
+  { id:'p2', cat:'p', n:'창덕궁', a:'종로구 율곡로 99', lat:37.5794, lng:126.9910,
+    b:'유네스코 세계유산, 후원이 백미', desc:'1405년 건립. 비원(후원)은 별도 가이드 투어로 입장.',
+    hours:'09:00-18:00 (월 휴궁)', fee:'3,000원 / 후원 5,000원', tip:'후원은 인터넷 사전예약 필수.' },
+  { id:'p3', cat:'p', n:'창경궁', a:'종로구 창경궁로 185', lat:37.5786, lng:126.9947,
+    b:'창덕궁과 연결된 조선 별궁', desc:'성종이 세조비를 위해 지은 별궁. 야간개장(춘추) 인기.',
+    hours:'09:00-21:00 (월 휴궁)', fee:'1,000원', tip:'창덕궁과 함께 묶어 관람.' },
+  { id:'p4', cat:'p', n:'덕수궁', a:'중구 세종대로 99', lat:37.5658, lng:126.9751,
+    b:'근대 한·서양 양식 혼재 궁궐', desc:'대한제국 황궁. 석조전·정관헌 등 서양식 건축. 야간조명 미려.',
+    hours:'09:00-21:00 (월 휴궁)', fee:'1,000원', tip:'정동길 산책과 묶음 추천.' },
+  { id:'p5', cat:'p', n:'종묘', a:'종로구 종로 157', lat:37.5748, lng:126.9940,
+    b:'유네스코 세계유산, 조선 왕실 사당', desc:'역대 왕·왕비 신주 모신 사당. 종묘제례악(무형유산).',
+    hours:'09:00-18:00 (화 휴궁)', fee:'1,000원', tip:'토·일·공휴일은 자유관람.' },
+  { id:'p6', cat:'p', n:'한양도성 박물관', a:'종로구 율곡로 283', lat:37.5709, lng:127.0080,
+    b:'4대문 성곽 역사 전시', desc:'한양도성 600년사 전시관. 흥인지문 옆 위치, 무료 입장.',
+    hours:'09:00-18:00 (월 휴관)', fee:'무료', tip:'한양도성 둘레길 시작점.' },
+
+  // 한옥·골목 h1-h5
+  { id:'h1', cat:'h', n:'북촌한옥마을', a:'종로구 가회동 일대', lat:37.5823, lng:126.9833,
+    b:'600년 된 전통 한옥 보존지구', desc:'경복궁·창덕궁 사이 한옥 밀집 지역. 8경 포토 스팟.',
+    hours:'24시간 (조용히)', fee:'무료', tip:'주민 거주 — 평일 낮 방문 권장.' },
+  { id:'h2', cat:'h', n:'서촌 (효자동·체부동)', a:'종로구 효자로 일대', lat:37.5790, lng:126.9706,
+    b:'경복궁 서쪽 옛 마을', desc:'통인시장·갤러리·카페가 있는 골목길. 인왕산 방향 산책.',
+    hours:'24시간', fee:'무료', tip:'통인시장·이상의 집 함께.' },
+  { id:'h3', cat:'h', n:'익선동 한옥거리', a:'종로구 익선동', lat:37.5731, lng:126.9904,
+    b:'레트로 한옥 카페·식당 골목', desc:'1920년대 한옥을 개조한 핫플 골목. 인스타 명소.',
+    hours:'각 매장 별', fee:'무료', tip:'주말 매우 붐빔. 평일 추천.' },
+  { id:'h4', cat:'h', n:'인사동 거리', a:'종로구 인사동길', lat:37.5716, lng:126.9852,
+    b:'전통 공예·갤러리·찻집', desc:'쌈지길·필방·한지 가게. 외국인 관광 1번지.',
+    hours:'10:00-22:00 매장별', fee:'무료', tip:'주말 차 없는 거리.' },
+  { id:'h5', cat:'h', n:'정동길', a:'중구 정동', lat:37.5664, lng:126.9728,
+    b:'덕수궁 돌담길·근대문화 거리', desc:'서울시립미술관·정동제일교회·돌담길 산책.',
+    hours:'24시간', fee:'무료', tip:'덕수궁 야간개장과 묶음.' },
+
+  // 시장·쇼핑 m1-m4
+  { id:'m1', cat:'m', n:'광장시장', a:'종로구 창경궁로 88', lat:37.5705, lng:127.0025,
+    b:'녹두전·마약김밥·육회 먹거리 시장', desc:'1905년 개장 100년+ 노포시장. 빈대떡·육회·마약김밥.',
+    hours:'09:00-23:00', fee:'무료 입장', tip:'미쉐린 빕구르망. 점심시간 줄 섬.' },
+  { id:'m2', cat:'m', n:'남대문시장', a:'중구 남창동', lat:37.5589, lng:126.9776,
+    b:'600년+ 종합 시장', desc:'갈치조림 골목·호떡·꽈배기. 대규모 의류·잡화.',
+    hours:'06:30-23:00', fee:'무료 입장', tip:'밤 도매·새벽 먹거리.' },
+  { id:'m3', cat:'m', n:'통인시장', a:'종로구 자하문로15길 18', lat:37.5803, lng:126.9700,
+    b:'엽전 도시락 카페 시장', desc:'엽전 5천원으로 다양한 반찬 구매하는 도시락 시스템.',
+    hours:'07:00-21:00 (셋째 일 휴장)', fee:'엽전 5,000원~', tip:'서촌 산책 코스에 포함.' },
+  { id:'m4', cat:'m', n:'동대문시장', a:'종로구 종로 일대', lat:37.5707, lng:127.0094,
+    b:'야간 쇼핑·패션 메카', desc:'두타·밀리오레·평화시장. 야간 의류 쇼핑 명소.',
+    hours:'10:30-새벽5:00', fee:'무료 입장', tip:'야간 도매. DDP 함께.' },
+
+  // 박물관·미술관 g1-g5
+  { id:'g1', cat:'g', n:'국립현대미술관 서울', a:'종로구 삼청로 30', lat:37.5790, lng:126.9802,
+    b:'MMCA 서울관, 현대미술 중심', desc:'기무사 부지에 들어선 모던 미술관. 다양한 기획전.',
+    hours:'10:00-18:00 (수·토 21:00, 월 휴관)', fee:'4,000원', tip:'경복궁·삼청동과 묶음.' },
+  { id:'g2', cat:'g', n:'국립민속박물관', a:'종로구 삼청로 37', lat:37.5816, lng:126.9794,
+    b:'경복궁 내 한국 민속 전시', desc:'전통 의·식·주·세시풍속 전시. 야외 전시도 풍부.',
+    hours:'09:00-18:00 (1·11월 - 17:00)', fee:'무료', tip:'경복궁 입장권 없이도 관람.' },
+  { id:'g3', cat:'g', n:'서울시립미술관', a:'중구 덕수궁길 61', lat:37.5644, lng:126.9737,
+    b:'정동 도심 속 미술관', desc:'옛 대법원 건물. 천경자컬렉션 상설. 도심 미술 산책.',
+    hours:'10:00-20:00 (월 휴관)', fee:'무료 (기획전 별도)', tip:'덕수궁 옆.' },
+  { id:'g4', cat:'g', n:'서울역사박물관', a:'종로구 새문안로 55', lat:37.5703, lng:126.9700,
+    b:'서울 600년 도시 역사', desc:'경희궁 옆. 조선~현대 서울 변천사. 가족 관람 좋음.',
+    hours:'09:00-18:00 (월 휴관)', fee:'무료', tip:'경희궁·돈의문박물관마을 함께.' },
+  { id:'g5', cat:'g', n:'청계천박물관', a:'성동구 청계천로 530', lat:37.5712, lng:127.0394,
+    b:'청계천 복원사 전시', desc:'청계천의 600년 역사·복원 과정 전시. 야외 청계천길 연결.',
+    hours:'09:00-19:00 (월 휴관)', fee:'무료', tip:'동쪽 끝, 동대문에서 도보.' },
+
+  // 공원·광장 n1-n6
+  { id:'n1', cat:'n', n:'광화문광장', a:'종로구 세종로', lat:37.5723, lng:126.9764,
+    b:'세종대왕·이순신 동상 광장', desc:'2022 재개장. 분수·잔디·역사물길. 야경 명소.',
+    hours:'24시간', fee:'무료', tip:'밤에 분수쇼 + 야경.' },
+  { id:'n2', cat:'n', n:'청계천', a:'중구·종로 청계천로', lat:37.5697, lng:126.9784,
+    b:'도심 복원 5.8km 산책 하천', desc:'2005 복원. 광교에서 동대문까지 시민 휴식 공간.',
+    hours:'24시간', fee:'무료', tip:'야간 조명 산책 추천.' },
+  { id:'n3', cat:'n', n:'탑골공원', a:'종로구 종로 99', lat:37.5710, lng:126.9885,
+    b:'3·1운동 발상지, 원각사지 10층 석탑', desc:'우리나라 최초의 도시공원. 국보 원각사지 석탑.',
+    hours:'06:00-21:00', fee:'무료', tip:'인사동·종로3가 함께.' },
+  { id:'n4', cat:'n', n:'서울로 7017', a:'중구 청파로', lat:37.5560, lng:126.9707,
+    b:'옛 고가도로 → 보행 정원길', desc:'서울역 위 고가를 정원으로 변신. 1km 산책로.',
+    hours:'24시간', fee:'무료', tip:'야간 조명 야경 좋음.' },
+  { id:'n5', cat:'n', n:'남산골 한옥마을', a:'중구 퇴계로34길 28', lat:37.5594, lng:126.9929,
+    b:'남산 자락 5채 전통 한옥', desc:'민속놀이·전통혼례·한복 체험. 타임캡슐 광장.',
+    hours:'09:00-21:00 (월 휴장)', fee:'무료', tip:'명동·충무로에서 도보 10분.' },
+  { id:'n6', cat:'n', n:'경희궁', a:'종로구 새문안로 45', lat:37.5722, lng:126.9685,
+    b:'복원 중인 조선 5대 궁', desc:'서궐. 일제가 훼손, 일부 복원. 무료 공원처럼 산책 가능.',
+    hours:'09:00-18:00 (월 휴궁)', fee:'무료', tip:'서울역사박물관과 묶음.' }
+];
+
 let visited = JSON.parse(localStorage.getItem('sj_visited') || '[]');
 let visits = JSON.parse(localStorage.getItem('sj_visits') || '{}');
 let customR = JSON.parse(localStorage.getItem('sj_custom') || '[]');
 let filter = 'all';
 let activeCourse = null;
+let activeTab = localStorage.getItem('sj_tab') || 'eat';
 
 const COURSES = [
   { id:'lunch', icon:'🌅', title:'광화문런치', desc:'광화문 오피스가 런치 5곳', ids:['k1','c3','c4','s2','e2'] },
@@ -772,8 +897,13 @@ const listEl = document.getElementById('list');
 let leafletMap = null;
 let markerById = {};
 
-function getAllR() { return [...R, ...customR]; }
+function getAllR() { return [...R, ...S, ...customR]; }
+function getEatR() { return [...R, ...customR.filter(r => EAT_CATS.includes(getCat(r)))]; }
+function getSeeR() { return S; }
 function getCat(r) { return r.cat || r.id[0]; }
+function isEat(r) { return EAT_CATS.includes(getCat(r)); }
+function isSee(r) { return SEE_CATS.includes(getCat(r)); }
+function getActiveItems() { return activeTab === 'eat' ? getEatR() : getSeeR(); }
 
 function saveAll() {
   localStorage.setItem('sj_visited', JSON.stringify(visited));
@@ -869,13 +999,18 @@ function renderPins() {
     const c = getCat(r);
     if (!r.lat || !r.lng) return;
     const isV = visited.includes(r.id);
-    const num = r.custom ? '★' : r.id.slice(1);
+    const see = isSee(r);
+    const inActiveTab = (activeTab === 'eat' && isEat(r)) || (activeTab === 'see' && see);
+    const num = r.custom ? '★' : (see ? (r.id[0]==='p'?'宮':r.id[0]==='h'?'巷':r.id[0]==='m'?'市':r.id[0]==='g'?'博':'園') : r.id.slice(1));
+    const sizeAttr = see ? [26,26] : [32,32];
+    const anchorAttr = see ? [13,13] : [16,16];
+    const cls = `r-pin r-pin-${c}${see?' see-pin':''}${isV?' visited':''}${!inActiveTab?' dim':''}`;
     const m = L.marker([r.lat, r.lng], {
       icon: L.divIcon({
         className: 'r-pin-icon',
-        html: `<div class="r-pin r-pin-${c}${isV?' visited':''}">${num}</div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+        html: `<div class="${cls}">${num}</div>`,
+        iconSize: sizeAttr,
+        iconAnchor: anchorAttr
       })
     }).addTo(leafletMap);
     m.on('click', () => scrollToCard(r.id));
@@ -892,8 +1027,8 @@ function toggleMap() {
 
 function renderList() {
   listEl.innerHTML = '';
-  const groups = { w:[], k:[], j:[], c:[], s:[], e:[] };
-  const all = getAllR();
+  const groups = { w:[], k:[], j:[], c:[], s:[], e:[], p:[], h:[], m:[], g:[], n:[] };
+  const all = getActiveItems();
   all.forEach(r => {
     const c = getCat(r);
     const courseIds = activeCourse ? COURSES.find(x => x.id === activeCourse)?.ids : null;
@@ -1215,9 +1350,17 @@ function removeCustom(id) {
 }
 
 function scrollToCard(id) {
+  // 다른 탭에 있으면 자동 전환
+  const item = getAllR().find(x => x.id === id);
+  if (item) {
+    const targetTab = isSee(item) ? 'see' : 'eat';
+    if (activeTab !== targetTab) {
+      switchTab(targetTab);
+    }
+  }
   if (filter !== 'all' && filter !== id[0] && !(filter === 'todo' && !visited.includes(id))) {
     filter = 'all';
-    document.querySelectorAll('.filters button').forEach(b => b.classList.toggle('active', b.dataset.f === 'all'));
+    renderFilters();
   }
   renderList();
   setTimeout(() => {
@@ -1232,10 +1375,12 @@ function scrollToCard(id) {
 }
 
 function updateProgress() {
-  const total = getAllR().length;
-  const pct = (visited.length / total) * 100;
+  const activeItems = getActiveItems();
+  const visitedInTab = activeItems.filter(r => visited.includes(r.id)).length;
+  const total = activeItems.length;
+  const pct = (visitedInTab / total) * 100;
   document.getElementById('pbar').style.width = pct + '%';
-  document.getElementById('pText').textContent = `${visited.length} / ${total}`;
+  document.getElementById('pText').textContent = `${visitedInTab} / ${total}`;
 }
 
 function render() {
@@ -1245,14 +1390,38 @@ function render() {
   updateProgress();
 }
 
-document.querySelectorAll('.filters button').forEach(b => {
-  b.addEventListener('click', () => {
-    filter = b.dataset.f;
-    document.querySelectorAll('.filters button').forEach(x => x.classList.toggle('active', x === b));
-    renderList();
-  });
-});
+function switchTab(tab) {
+  activeTab = tab;
+  filter = 'all';
+  activeCourse = null;
+  localStorage.setItem('sj_tab', tab);
+  document.getElementById('tabEat').classList.toggle('active', tab === 'eat');
+  document.getElementById('tabSee').classList.toggle('active', tab === 'see');
+  renderFilters();
+  render();
+}
 
+function renderFilters() {
+  const cats = activeTab === 'eat' ? EAT_CATS : SEE_CATS;
+  const bar = document.getElementById('filtersBar');
+  const buttons = [`<button class="${filter==='all'?'active':''}" data-f="all">전체</button>`];
+  cats.forEach(c => {
+    buttons.push(`<button class="${filter===c?'active':''}" data-f="${c}">${CUISINES[c]}</button>`);
+  });
+  buttons.push(`<button class="${filter==='todo'?'active':''}" data-f="todo">미방문만</button>`);
+  bar.innerHTML = buttons.join('');
+  bar.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      filter = b.dataset.f;
+      bar.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b));
+      renderList();
+    });
+  });
+}
+
+renderFilters();
+document.getElementById('tabEat').classList.toggle('active', activeTab === 'eat');
+document.getElementById('tabSee').classList.toggle('active', activeTab === 'see');
 render();
 
 /* ===== PWA: Service Worker 등록 ===== */
