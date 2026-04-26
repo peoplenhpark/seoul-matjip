@@ -1,7 +1,7 @@
 {
   "name": "서울 도심 만남 컨시어지",
   "short_name": "서울 만남",
-  "description": "3초 만에 맞춤 코스. 서울 4대문 안 맛집 35 + 볼거리 26곳 컨시어지.",
+  "description": "3초 만에 맞춤 코스. 서울 4대문 안 맛집 45 + 볼거리 26곳 컨시어지.",
   "start_url": "./seoul_restaurants.html",
   "scope": "./",
   "display": "standalone",
