@@ -1,5 +1,5 @@
-/* Service Worker: 서울 4대문 안 맛집 체크리스트 PWA */
-const CACHE = 'seoul-matjip-v4';
+/* Service Worker: 서울 도심 만남 컨시어지 PWA */
+const CACHE = 'seoul-matjip-v5';
 const ASSETS = [
   './',
   './seoul_restaurants.html',

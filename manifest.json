@@ -1,7 +1,7 @@
 {
-  "name": "서울 4대문 안 맛집 체크리스트",
-  "short_name": "서울 맛집",
-  "description": "서울 4대문 안 + 서촌·북촌·명동·장충 맛집 30곳 체크리스트",
+  "name": "서울 도심 만남 컨시어지",
+  "short_name": "서울 만남",
+  "description": "3초 만에 맞춤 코스. 서울 4대문 안 맛집 35 + 볼거리 26곳 컨시어지.",
   "start_url": "./seoul_restaurants.html",
   "scope": "./",
   "display": "standalone",

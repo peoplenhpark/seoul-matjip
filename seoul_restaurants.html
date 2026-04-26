@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes">
-<title>서울 4대문 안 맛집 체크리스트</title>
+<title>서울 도심 만남 컨시어지</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#5a3a1a">
-<meta name="description" content="서울 4대문 안 + 서촌·북촌·명동·장충 맛집 30곳 체크리스트. 호텔 제외, 실존 맛집만.">
+<meta name="description" content="3초 만에 맞춤 코스 추천. 서울 4대문 안 맛집 35 + 볼거리 26곳 컨시어지. 시간·동네·동행자 입력 → 식당+볼거리 즉시 추천.">
 
 <!-- Open Graph (카카오톡·페이스북 공유 미리보기) -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="🍽️ 서울 4대문 안 맛집 체크리스트">
-<meta property="og:description" content="광화문·서촌·북촌·명동·을지로의 진짜 맛집 30곳. 지도·체크리스트·추천 코스·룰렛까지. PWA 앱으로 설치 가능.">
+<meta property="og:title" content="🎯 서울 도심 만남 컨시어지">
+<meta property="og:description" content="3초 만에 맞춤 코스 추천. 서울 4대문 안 맛집 35 + 볼거리 26곳. 시간·동네·동행자 입력 → 식당+볼거리 즉시 추천. PWA 앱 설치 가능.">
 <meta property="og:image" content="og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -22,13 +22,13 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="🍽️ 서울 4대문 안 맛집 체크리스트">
-<meta name="twitter:description" content="서울 도심 맛집 30곳. 지도·체크리스트·룰렛.">
+<meta name="twitter:description" content="서울 4대문 안 맛집+볼거리 빠른 추천 컨시어지.">
 <meta name="twitter:image" content="og-image.png">
 
 <!-- iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="서울 맛집">
+<meta name="apple-mobile-web-app-title" content="서울 만남">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 
@@ -144,6 +144,88 @@
   .r-pin-n { background: #6a9a5a; }
   .r-pin.see-pin { width: 26px; height: 26px; font-size: 13px; opacity: 0.9; }
   .r-pin.dim { opacity: 0.35 !important; }
+
+  /* 🎯 Hero CTA */
+  .hero { padding: 12px 8px 4px; background: var(--paper); }
+  .hero-cta {
+    width: 100%; display: flex; align-items: center; gap: 14px;
+    padding: 16px 18px; border-radius: 14px; cursor: pointer;
+    background: linear-gradient(135deg, #e8a848 0%, #d04040 100%);
+    color: #fff; border: none; box-shadow: 0 4px 14px rgba(208,64,64,0.3);
+    font-family: inherit; transition: all 0.2s;
+  }
+  .hero-cta:hover, .hero-cta:active { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(208,64,64,0.4); }
+  .hero-icon { font-size: 32px; flex-shrink: 0; }
+  .hero-text { flex: 1; text-align: left; }
+  .hero-title { font-size: 18px; font-weight: 900; }
+  .hero-sub { font-size: 12px; opacity: 0.92; margin-top: 2px; }
+  .hero-arrow { font-size: 24px; font-weight: 900; opacity: 0.85; }
+  .hero-recent { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; padding: 2px; scrollbar-width: none; }
+  .hero-recent::-webkit-scrollbar { display: none; }
+  .hero-recent .rcnt {
+    flex-shrink: 0; padding: 5px 10px; background: #fff; border: 1px solid #d8b068;
+    border-radius: 14px; font-size: 11px; color: var(--ink); white-space: nowrap;
+    cursor: pointer; font-weight: 700;
+  }
+  .hero-recent .rcnt:hover { background: #fde8b8; }
+
+  /* 컨시어지 위저드 모달 */
+  .wiz-modal { position: fixed; inset: 0; background: rgba(40,26,10,0.88); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
+  .wiz-modal.show { display: flex; }
+  .wiz-sheet {
+    background: var(--paper); width: 100%; max-width: 600px; max-height: 92vh;
+    border-radius: 18px 18px 0 0; padding: 18px 18px calc(18px + var(--safe-bot)); overflow-y: auto;
+    animation: slideUp 0.25s cubic-bezier(0.2,1,0.3,1);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .wiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .wiz-header h2 { margin: 0; font-size: 18px; color: var(--ink); }
+  .wiz-close { background: none; border: none; font-size: 26px; color: #8a6040; cursor: pointer; line-height: 1; padding: 0 4px; }
+  .wiz-progress { display: flex; gap: 4px; margin-bottom: 18px; }
+  .wiz-progress span { flex: 1; height: 4px; background: #e0d0a8; border-radius: 2px; }
+  .wiz-progress span.done { background: #e8a848; }
+  .wiz-step h3 { margin: 0 0 12px; font-size: 16px; color: var(--ink); }
+  .wiz-options { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+  .wiz-options.wide { grid-template-columns: 1fr; }
+  .wiz-options button {
+    padding: 14px 10px; border: 2px solid #d8b068; border-radius: 10px;
+    background: #fff; color: var(--ink); font-weight: 900; font-size: 14px;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .wiz-options button.selected { background: #e8a848; color: #3a2a10; border-color: #8a5a18; transform: scale(0.97); }
+  .wiz-input { width: 100%; padding: 12px 14px; border: 2px solid #d8b068; border-radius: 10px; font-size: 14px; font-family: inherit; margin-bottom: 14px; background: #fff; }
+  .wiz-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .wiz-actions button { flex: 1; padding: 14px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 15px; font-family: inherit; border: 2px solid; }
+  .wiz-actions .secondary { background: #fff; border-color: #c0a068; color: var(--ink); }
+  .wiz-actions .primary { background: #e8a848; border-color: #8a5a18; color: #3a2a10; }
+  .wiz-actions button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* 추천 결과 */
+  .rec-result { padding: 4px; }
+  .rec-card {
+    background: #fff; border: 2px solid #d8b068; border-radius: 12px;
+    padding: 14px; margin-bottom: 10px;
+  }
+  .rec-card .rt { font-size: 11px; color: #8a5a18; font-weight: 900; margin-bottom: 4px; }
+  .rec-card .rn { font-size: 17px; font-weight: 900; color: var(--ink); margin-bottom: 4px; }
+  .rec-card .rb { font-size: 13px; color: #6a4a20; margin-bottom: 10px; }
+  .rec-card .ra { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rec-card .ra a, .rec-card .ra button {
+    padding: 7px 12px; border: 1.5px solid #c0a068; border-radius: 14px;
+    background: #fff; color: var(--ink); font-weight: 700; font-size: 12px;
+    text-decoration: none; cursor: pointer; font-family: inherit;
+  }
+  .rec-walk {
+    text-align: center; font-size: 12px; color: #8a6040; padding: 8px;
+    border-top: 1px dashed #c0a068; border-bottom: 1px dashed #c0a068;
+    margin: 6px 0; font-weight: 700;
+  }
+
+  /* 신뢰 등급 뱃지 */
+  .trust-badge { display: inline-flex; align-items: center; gap: 2px; font-size: 11px; font-weight: 900; padding: 2px 7px; border-radius: 10px; margin-left: 4px; }
+  .trust-3 { background: #fff3d0; color: #b87a18; border: 1px solid #d8a848; }
+  .trust-2 { background: #f0f0f0; color: #6a6a6a; border: 1px solid #b0b0b0; }
+  .trust-1 { background: #fdfdf8; color: #8a8068; }
 
   /* 메인 탭 (맛집/볼거리) */
   .main-tabs {
@@ -476,7 +558,7 @@
 <body>
 
 <header>
-  <h1>🍽️🏛️ 서울 4대문 안 도심 가이드 <span style="font-size:10px;font-weight:700;opacity:0.7;">v4.0</span></h1>
+  <h1>🎯 서울 도심 만남 컨시어지 <span style="font-size:10px;font-weight:700;opacity:0.7;">v5.0</span></h1>
   <div class="progress-wrap">
     <div class="progress-bar"><div id="pbar"></div></div>
     <div class="progress-text" id="pText">0 / 30</div>
@@ -507,9 +589,22 @@
     📍 호텔 제외 · <strong>4대문 안 + 서촌·북촌·삼청동·명동·장충 북쪽</strong> 맛집 30곳
   </div>
 
+  <!-- 🎯 컨시어지 Hero CTA -->
+  <div class="hero">
+    <button class="hero-cta" onclick="openWizard()">
+      <div class="hero-icon">🎯</div>
+      <div class="hero-text">
+        <div class="hero-title">오늘 만남 시작</div>
+        <div class="hero-sub">3초 만에 맞춤 코스 추천</div>
+      </div>
+      <div class="hero-arrow">›</div>
+    </button>
+    <div class="hero-recent" id="heroRecent"></div>
+  </div>
+
   <!-- 메인 탭 (맛집 / 볼거리) -->
   <div class="main-tabs">
-    <button id="tabEat" onclick="switchTab('eat')">🍽️ 맛집 30</button>
+    <button id="tabEat" onclick="switchTab('eat')">🍽️ 맛집 35</button>
     <button id="tabSee" onclick="switchTab('see')">🏛️ 볼거리 26</button>
   </div>
 
@@ -521,6 +616,20 @@
   <div id="list"></div>
 </div>
 
+</div>
+
+<!-- 🎯 컨시어지 위저드 모달 -->
+<div class="wiz-modal" id="wizModal">
+  <div class="wiz-sheet">
+    <div class="wiz-header">
+      <h2 id="wizTitle">🎯 오늘 만남 시작</h2>
+      <button class="wiz-close" onclick="closeWizard()">×</button>
+    </div>
+    <div class="wiz-progress">
+      <span class="done"></span><span></span><span></span>
+    </div>
+    <div id="wizBody"></div>
+  </div>
 </div>
 
 <!-- 룰렛 모달 -->
@@ -539,6 +648,9 @@
     <h2 id="visitModalTitle">🎉 방문 기록</h2>
     <label>📅 방문 날짜
       <input type="date" id="visitDate">
+    </label>
+    <label>👤 함께한 사람
+      <input type="text" id="visitCompanion" placeholder="예: 박OO, 가족, 혼자">
     </label>
     <label>⭐ 평점
       <div class="rating-input" id="ratingInput"></div>
@@ -657,6 +769,31 @@ const R = [
     desc:'궁중음식·반가음식을 현대적으로 재해석. 전통 한옥 공간. 미쉐린 1스타 다년 유지.',
     hours:'런치·디너 2회전 (예약제)', price:'1인 18~30만원',
     menu:'맷돌두부, 궁중신선로, 계절 반찬', tip:'1~2개월 전 예약 오픈, 조기 마감.' },
+  { id:'k6', n:'두레유 (Dooreyoo)', v:'한옥 단독', a:'종로구 북촌로11길 (계동)', lat:37.5817, lng:126.9849,
+    b:'미쉐린 ★ · 한식 파인다이닝',
+    desc:'유현수 셰프의 한식 파인다이닝. 한국 식문화의 본질을 재해석. 북촌 한옥 공간.',
+    hours:'런치 12:00-15:00 / 디너 18:00-22:00 (월 휴무)', price:'1인 15~30만원',
+    menu:'두레유 시즌 코스, 한우구이', tip:'1~2개월 전 예약. 비즈니스·기념일 적합.' },
+  { id:'k7', n:'한식공간', v:'한옥 단독', a:'종로구 삼청로 128-9', lat:37.5837, lng:126.9803,
+    b:'미쉐린 ★ · 조희숙 셰프 한식',
+    desc:'한식의 대모 조희숙 셰프 한식 파인다이닝. 정통 한식의 격조를 한옥 공간에서.',
+    hours:'런치·디너 2회전 (예약제, 일·월 휴무)', price:'1인 15~25만원',
+    menu:'계절 한정식 코스, 발효 음식', tip:'캐치테이블 예약. 삼청동 산책과 묶음.' },
+  { id:'k8', n:'토속촌 삼계탕', v:'노포 한옥', a:'종로구 자하문로5길 5 (체부동)', lat:37.5762, lng:126.9697,
+    b:'대통령도 찾은 삼계탕 노포', phone:'02-737-7444',
+    desc:'서촌 체부동 골목, 노무현·문재인 대통령이 찾은 삼계탕 명가. 약재 듬뿍.',
+    hours:'10:00-22:00 (연중무휴)', price:'삼계탕 2만원~',
+    menu:'삼계탕, 산삼배양근 삼계탕, 전기구이', tip:'점심 시간 줄 김. 11시 오픈런 추천.' },
+  { id:'k9', n:'하동관 명동 본점', v:'노포 빌딩', a:'중구 명동9길 12', lat:37.5640, lng:126.9842,
+    b:'곰탕 노포 (1939~)', phone:'02-776-5656',
+    desc:'1939년 개업, 80년+ 곰탕 명가. 깔끔한 양지 곰탕과 깍두기. 미쉐린 빕구르망.',
+    hours:'07:00-16:00 (재료 소진 시 마감)', price:'곰탕 1.6만원~',
+    menu:'곰탕 보통/특, 수육', tip:'점심 전후 매진 주의. 아침/이른 점심 추천.' },
+  { id:'k10', n:'남포면옥', v:'노포 빌딩', a:'중구 을지로 24', lat:37.5663, lng:126.9824,
+    b:'평양냉면 노포 (1957~), 미쉐린 빕구르망', phone:'02-777-3131',
+    desc:'1957년 개업 평양냉면집. 깊고 진한 육수, 두꺼운 메밀면. 우래옥과 함께 평양냉면 양대 산맥.',
+    hours:'11:00-21:30', price:'평양냉면 1.5만원~',
+    menu:'평양냉면, 어복쟁반, 만두', tip:'우래옥보다 진한 맛 선호 시. 한겨울에도 줄 섬.' },
 
   // 일식 j1-j5 (스시 오마카세·라멘)
   { id:'j1', n:'스시 소라 광화문점', v:'르메이에르종로타운 B1', a:'종로구 종로 19', lat:37.57, lng:126.9834,
@@ -905,6 +1042,43 @@ function isEat(r) { return EAT_CATS.includes(getCat(r)); }
 function isSee(r) { return SEE_CATS.includes(getCat(r)); }
 function getActiveItems() { return activeTab === 'eat' ? getEatR() : getSeeR(); }
 
+/* ===== 신뢰 등급 자동 계산 ===== */
+function getTrust(r) {
+  const txt = (r.b || '') + ' ' + (r.desc || '');
+  if (/미쉐린\s*★|미쉐린 1스타|미쉐린 ?스타|유네스코/i.test(txt)) return 3;
+  if (/19[0-5]\d~|18\d\d~|국내 최초|미쉐린 빕구르망|블루리본|대통령/i.test(txt)) return 3;
+  if (/미쉐린|노포|백년|대표|시그니처/i.test(txt)) return 2;
+  return 1;
+}
+function trustBadge(r) {
+  const t = getTrust(r);
+  if (t === 3) return '<span class="trust-badge trust-3">⭐⭐⭐ 명품</span>';
+  if (t === 2) return '<span class="trust-badge trust-2">⭐⭐ 검증</span>';
+  return '';
+}
+
+/* ===== 지역 매핑 (GPS → 동네) ===== */
+function getArea(r) {
+  if (!r.lat || !r.lng) return 'any';
+  const { lat, lng } = r;
+  if (lat > 37.578) return 'bukchon';      // 북촌·삼청·서촌
+  if (lng > 126.989 && lat < 37.572) return 'euljiro'; // 을지로·동대문
+  if (lat < 37.566) return 'myeongdong';   // 명동·남대문·충무로
+  return 'gwanghwamun';                    // 광화문·시청·종로
+}
+
+/* ===== 도보 거리 계산 (Haversine) ===== */
+function walkDistance(a, b) {
+  if (!a || !b || !a.lat || !b.lat) return null;
+  const R_ = 6371000;
+  const φ1 = a.lat * Math.PI/180, φ2 = b.lat * Math.PI/180;
+  const Δφ = (b.lat - a.lat) * Math.PI/180;
+  const Δλ = (b.lng - a.lng) * Math.PI/180;
+  const x = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
+  const meters = 2 * R_ * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+  return { m: Math.round(meters), min: Math.max(1, Math.round(meters/75)) };
+}
+
 function saveAll() {
   localStorage.setItem('sj_visited', JSON.stringify(visited));
   localStorage.setItem('sj_visits', JSON.stringify(visits));
@@ -1061,7 +1235,7 @@ function renderList() {
           <input type="checkbox" class="card-check" ${isV?'checked':''}>
           <div class="card-num ${c}">${isCustom ? '★' : r.id.slice(1)}</div>
           <div class="card-info">
-            <div class="card-name">${r.n} ${isCustom?'<span class="custom-badge">내 맛집</span>':''}</div>
+            <div class="card-name">${r.n} ${trustBadge(r)}${isCustom?'<span class="custom-badge">내 맛집</span>':''}</div>
             <div class="card-meta">${r.v||''}${r.v && r.a?' · ':''}${r.a||''}</div>
           </div>
           <div class="card-arrow">›</div>
@@ -1076,6 +1250,7 @@ function renderList() {
         </div>
         ${v ? `
           <div class="visit-record">
+            ${v.companion ? `<div style="font-size:11px;color:#8a5a18;font-weight:900;">👤 ${v.companion}</div>` : ''}
             <div class="stars">${'★'.repeat(v.rating||0)}${'☆'.repeat(5-(v.rating||0))}</div>
             <div class="visit-date">${v.date||''}</div>
             <div class="visit-memo">${v.memo ? '"'+v.memo+'"' : ''}</div>
@@ -1241,6 +1416,8 @@ function openVisitModal(id) {
   document.getElementById('visitModalTitle').textContent = `🎉 ${r.n}`;
   document.getElementById('visitDate').value = v.date || new Date().toISOString().slice(0,10);
   document.getElementById('visitMemo').value = v.memo || '';
+  const compEl = document.getElementById('visitCompanion');
+  if (compEl) compEl.value = v.companion || (wizState && wizState.companion) || '';
   renderRating(v.rating || 0);
   document.getElementById('visitModal').classList.add('show');
 }
@@ -1264,10 +1441,12 @@ function renderRating(r) {
 }
 function saveVisit() {
   if (!currentVisitId) return;
+  const compEl = document.getElementById('visitCompanion');
   visits[currentVisitId] = {
     date: document.getElementById('visitDate').value,
     rating: selectedRating,
-    memo: document.getElementById('visitMemo').value.trim()
+    memo: document.getElementById('visitMemo').value.trim(),
+    companion: compEl ? compEl.value.trim() : ''
   };
   saveAll();
   closeVisitModal();
@@ -1419,6 +1598,160 @@ function renderFilters() {
   });
 }
 
+/* ===== 🎯 컨시어지 위저드 ===== */
+let wizState = { step: 1, time: '', area: '', mood: '', companion: '', types: ['eat', 'see'] };
+const WIZ_TIMES = [['lunch','🌞 점심'],['afternoon','☕ 오후'],['dinner','🍷 저녁'],['night','🌙 야간']];
+const WIZ_AREAS = [['gwanghwamun','🏛️ 광화문·시청'],['bukchon','🏘️ 북촌·삼청동'],['myeongdong','🛍️ 명동·충무로'],['euljiro','🌆 을지로·동대문'],['any','🗺️ 어디든 OK']];
+const WIZ_MOODS = [['casual','😊 캐주얼'],['date','💕 데이트'],['business','💼 업무'],['family','👨‍👩‍👧 가족']];
+
+function openWizard() {
+  wizState = { step: 1, time: '', area: '', mood: '', companion: '', types: ['eat', 'see'] };
+  document.getElementById('wizTitle').textContent = '🎯 오늘 만남 시작';
+  document.getElementById('wizModal').classList.add('show');
+  renderWizStep();
+}
+function closeWizard() {
+  document.getElementById('wizModal').classList.remove('show');
+}
+function renderWizStep() {
+  const dots = document.querySelectorAll('.wiz-progress span');
+  dots.forEach((d, i) => d.classList.toggle('done', i < wizState.step));
+  const body = document.getElementById('wizBody');
+  if (wizState.step === 1) {
+    body.innerHTML = `
+      <div class="wiz-step">
+        <h3>1️⃣ 언제 만나세요?</h3>
+        <div class="wiz-options">
+          ${WIZ_TIMES.map(([k,v]) => `<button class="${wizState.time===k?'selected':''}" onclick="wizSet('time','${k}')">${v}</button>`).join('')}
+        </div>
+        <h3>👤 누구와? (선택)</h3>
+        <input class="wiz-input" id="wizCompanion" placeholder="예: 박OO, 가족, 친구" value="${wizState.companion}">
+        <div class="wiz-actions">
+          <button class="primary" onclick="wizNext()" ${!wizState.time?'disabled':''}>다음 →</button>
+        </div>
+      </div>`;
+    document.getElementById('wizCompanion').addEventListener('input', e => wizState.companion = e.target.value);
+  } else if (wizState.step === 2) {
+    body.innerHTML = `
+      <div class="wiz-step">
+        <h3>2️⃣ 어디서 만나세요?</h3>
+        <div class="wiz-options wide">
+          ${WIZ_AREAS.map(([k,v]) => `<button class="${wizState.area===k?'selected':''}" onclick="wizSet('area','${k}')">${v}</button>`).join('')}
+        </div>
+        <div class="wiz-actions">
+          <button class="secondary" onclick="wizPrev()">← 이전</button>
+          <button class="primary" onclick="wizNext()" ${!wizState.area?'disabled':''}>다음 →</button>
+        </div>
+      </div>`;
+  } else {
+    body.innerHTML = `
+      <div class="wiz-step">
+        <h3>3️⃣ 어떤 분위기?</h3>
+        <div class="wiz-options">
+          ${WIZ_MOODS.map(([k,v]) => `<button class="${wizState.mood===k?'selected':''}" onclick="wizSet('mood','${k}')">${v}</button>`).join('')}
+        </div>
+        <div class="wiz-actions">
+          <button class="secondary" onclick="wizPrev()">← 이전</button>
+          <button class="primary" onclick="recommend()" ${!wizState.mood?'disabled':''}>🎯 추천받기</button>
+        </div>
+      </div>`;
+  }
+}
+function wizSet(key, val) { wizState[key] = val; renderWizStep(); }
+function wizNext() { if (wizState.step < 3) { wizState.step++; renderWizStep(); } }
+function wizPrev() { if (wizState.step > 1) { wizState.step--; renderWizStep(); } }
+
+function recommend() {
+  const all = getAllR();
+  const eatPool = all.filter(r => isEat(r) && r.lat);
+  const seePool = all.filter(r => isSee(r) && r.lat);
+  const visitedWithCompanion = new Set();
+  if (wizState.companion) {
+    Object.entries(visits).forEach(([id, v]) => {
+      if (v.companion && v.companion.includes(wizState.companion.trim())) {
+        visitedWithCompanion.add(id);
+      }
+    });
+  }
+  function score(r) {
+    let s = Math.random() * 5;
+    if (visitedWithCompanion.has(r.id)) s -= 1000;
+    if (wizState.area === 'any' || getArea(r) === wizState.area) s += 30;
+    s += getTrust(r) * 8;
+    const txt = (r.b || '') + (r.desc || '');
+    if (wizState.mood === 'date' && /파인|미쉐린|전망|뷰|한옥/i.test(txt)) s += 10;
+    if (wizState.mood === 'business' && /파인|코스|개별룸|호텔|미쉐린/i.test(txt)) s += 10;
+    if (wizState.mood === 'casual' && getTrust(r) <= 2) s += 5;
+    return s;
+  }
+  const eatPick = eatPool.sort((a,b) => score(b) - score(a))[0];
+  const seePick = seePool.sort((a,b) => score(b) - score(a))[0];
+  const walk = walkDistance(eatPick, seePick);
+  showRecommendation(eatPick, seePick, walk);
+}
+
+function showRecommendation(eat, see, walk) {
+  const body = document.getElementById('wizBody');
+  document.getElementById('wizTitle').textContent = '✨ 오늘의 추천 코스';
+  document.querySelectorAll('.wiz-progress span').forEach(s => s.classList.add('done'));
+  body.innerHTML = `
+    <div class="rec-result">
+      ${renderRecCard(eat, '🍽️ 식사')}
+      ${walk ? `<div class="rec-walk">↓ 도보 ${walk.min}분 (${walk.m}m) ↓</div>` : ''}
+      ${see ? renderRecCard(see, '🏛️ 볼거리') : ''}
+      <div class="wiz-actions">
+        <button class="secondary" onclick="recommend()">🔄 다른 추천</button>
+        <button class="primary" onclick="confirmMeet('${eat.id}', '${see ? see.id : ''}')">✅ 가기로 결정</button>
+      </div>
+    </div>`;
+}
+
+function renderRecCard(r, label) {
+  const urls = buildUrls(r);
+  return `<div class="rec-card">
+    <div class="rt">${label} ${trustBadge(r)}</div>
+    <div class="rn">${r.n}</div>
+    <div class="rb">${r.b || ''} · ${r.a || ''}</div>
+    <div class="ra">
+      ${r.phone ? `<a href="tel:${r.phone.replace(/-/g,'')}" onclick="event.stopPropagation()">📞 전화</a>` : ''}
+      <a href="${urls.kakao}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🗺️ 지도</a>
+      ${isEat(r) ? `<a href="${urls.catchtable}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📅 예약</a>` : ''}
+      <button onclick="closeWizard(); scrollToCard('${r.id}')">📋 상세</button>
+    </div>
+  </div>`;
+}
+
+function confirmMeet(eatId, seeId) {
+  const meet = {
+    date: new Date().toISOString().slice(0,10),
+    companion: wizState.companion || '',
+    eat: eatId,
+    see: seeId || '',
+    area: wizState.area,
+    mood: wizState.mood
+  };
+  const meetings = JSON.parse(localStorage.getItem('sj_meetings') || '[]');
+  meetings.unshift(meet);
+  localStorage.setItem('sj_meetings', JSON.stringify(meetings.slice(0, 20)));
+  closeWizard();
+  renderRecent();
+  alert(`✅ "${wizState.companion || '오늘 만남'}" 코스 저장됨!\n\n식당·볼거리 카드에서 다녀온 후 체크 + 평점 남겨주세요.`);
+}
+
+function renderRecent() {
+  const el = document.getElementById('heroRecent');
+  if (!el) return;
+  const meetings = JSON.parse(localStorage.getItem('sj_meetings') || '[]');
+  if (!meetings.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<span style="font-size:11px;color:#8a6040;font-weight:700;align-self:center;padding:0 4px;">최근:</span>' +
+    meetings.slice(0, 5).map(m => {
+      const r = getAllR().find(x => x.id === m.eat);
+      const label = (m.companion || '만남') + (r ? ` · ${r.n.slice(0,8)}` : '');
+      return `<span class="rcnt" onclick="scrollToCard('${m.eat}')">${m.date.slice(5)} ${label}</span>`;
+    }).join('');
+}
+
+renderRecent();
 renderFilters();
 document.getElementById('tabEat').classList.toggle('active', activeTab === 'eat');
 document.getElementById('tabSee').classList.toggle('active', activeTab === 'see');
