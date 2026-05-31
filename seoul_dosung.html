@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+<title>한양도성 전도 (순성길)</title>
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    background: #f0ece0;
+    font-family: 'Malgun Gothic', sans-serif;
+    text-align: center;
+  }
+  h1 { color: #3a2a1a; margin-bottom: 4px; }
+  .sub { color: #6a5a4a; font-size: 14px; margin: 0 0 14px; }
+  .toolbar {
+    margin: 14px 0 22px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  button, a.btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #6b4422;
+    background: #d9a76a;
+    color: #3a2a1a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+    text-decoration: none;
+    display: inline-block;
+  }
+  button:hover, a.btn:hover { background: #e8b880; }
+  button.blue { background: #7fb3d9; border-color: #1e3a55; color: #fff; }
+  button.blue:hover { background: #5f9cc8; }
+  #map-container {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    max-width: 1100px;
+    margin: 0 auto;
+    overflow: auto;
+  }
+  #mapImg {
+    width: 100%;
+    height: auto;
+    display: block;
+    transform-origin: 0 0;
+    transition: transform .15s ease;
+    cursor: zoom-in;
+  }
+  #mapImg.zoomed { cursor: zoom-out; }
+  .hint { color: #6a5a4a; font-size: 13px; margin-top: 10px; }
+</style>
+</head>
+<body>
+  <h1>한양도성 전도</h1>
+  <p class="sub">순성길 4개 구간 · 4대문(흥인지문·숭례문·돈의문 터·숙정문) + 4소문 + 백악산·인왕산·낙산·남산</p>
+  <div class="toolbar">
+    <button onclick="zoom(0.25)">➕ 확대</button>
+    <button onclick="zoom(-0.25)">➖ 축소</button>
+    <button onclick="resetZoom()">↺ 원래대로</button>
+    <a class="btn blue" href="seoul_dosung.jpg" download="한양도성_전도.jpg">⬇ 이미지 다운로드</a>
+    <button onclick="window.print()">🖨 인쇄</button>
+  </div>
+  <div id="map-container">
+    <img id="mapImg" src="seoul_dosung.jpg" alt="한양도성 전도 (순성길 코스 지도)">
+  </div>
+  <p class="hint">이미지를 탭/클릭하면 확대됩니다. 모바일은 두 손가락 핀치줌도 됩니다. PNG가 아닌 원본 JPG로 저장돼 카톡·메모장 첨부에 편합니다.</p>
+
+<script>
+  const img = document.getElementById('mapImg');
+  let scale = 1;
+  function apply() {
+    img.style.transform = 'scale(' + scale + ')';
+    img.classList.toggle('zoomed', scale > 1);
+  }
+  function zoom(delta) {
+    scale = Math.min(5, Math.max(1, scale + delta));
+    apply();
+  }
+  function resetZoom() { scale = 1; apply(); }
+  img.addEventListener('click', () => { scale = scale > 1 ? 1 : 2; apply(); });
+</script>
+</body>
+</html>

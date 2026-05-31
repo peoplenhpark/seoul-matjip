@@ -1,5 +1,5 @@
 /* Service Worker: 서울 도심 만남 컨시어지 PWA */
-const CACHE = 'seoul-matjip-v6';
+const CACHE = 'seoul-matjip-v7';
 const ASSETS = [
   './',
   './seoul_restaurants.html',
